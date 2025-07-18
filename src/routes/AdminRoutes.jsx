@@ -278,6 +278,10 @@ const AdminRoutes = {
       element: <Skulist />
     },
     {
+      path: 'skulist',
+      element: <Skulist />
+    },
+    {
       path: '*',
       element: <NotFound />
     }

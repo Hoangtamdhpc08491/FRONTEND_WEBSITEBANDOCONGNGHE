@@ -203,12 +203,6 @@ export const API_ENDPOINT = {
     systemSettings: {
       base: `${API_BASE_URL}/admin/system-settings`
     },
-    Auth: {
-      base: `${API_BASE_URL}/admin`,
-      login: '/dang-nhap-dashboard',
-      getUserInfo: '/account-info',
-      logout: '/dang-xuat'
-    },
     dashboard: {
       base: `${API_BASE_URL}/admin/dashboard`,
       getStats: '/stats',
@@ -239,6 +233,20 @@ export const API_ENDPOINT = {
       getBrandList: '/brands/list',
       getById: (slug) => `/product/${slug}`,
       forceDeleteMany: '/product/force-delete-many',
+      softDelete: (id) => `/product/soft/${id}`,
+      softDeleteMany: '/product/soft-delete-many',
+      restore: (id) => `/product/restore/${id}`,
+      restoreMany: '/product/restore-many',
+      forceDelete: (id) => `/product/force/${id}`,
+      updateOrderIndexBulk: '/product/update-order'
+    },
+     sku: {
+      base: `${API_BASE_URL}/admin/sku`,
+      getAll: '/',
+      logsBySkuId: (id) => `/${id}/logs`,
+      importStock: (id) => `/${id}/import`,
+      // getById: (slug) => `/product/${slug}`,
+      exportStock: (id) =>  `/${id}/export`,
       softDelete: (id) => `/product/soft/${id}`,
       softDeleteMany: '/product/soft-delete-many',
       restore: (id) => `/product/restore/${id}`,

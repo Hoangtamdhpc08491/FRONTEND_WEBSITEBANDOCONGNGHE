@@ -55,9 +55,7 @@ const ClientRoutes = {
     {
       path: 'user-profile',
       element: (
-        <RequireAuth>
           <UserProfilePage />
-        </RequireAuth>
       ),
       children: [
         { index: true, element: <></> },

@@ -69,6 +69,7 @@ export default function UserPermissionCard({ label, subject, desc }) {
           permissionsService.getMatrix(subject)
         ]);
         setRoles(roleRes.data.data || []);
+        console.log('roleRes',roleRes.data.data)
         setPermissions(permRes.data.data || []);
         setMatrix(matrixRes.data.data || {});
       } catch (err) {
@@ -82,6 +83,7 @@ export default function UserPermissionCard({ label, subject, desc }) {
   }, [subject, expanded]);
 
   const handlePermissionChange = async (roleId, action, checked) => {
+    console.log('giá trị khi update là',roleId);
     if (preventSpam('update_permission')) return;
 
     const optimisticMatrix = JSON.parse(JSON.stringify(matrix));
@@ -100,7 +102,7 @@ export default function UserPermissionCard({ label, subject, desc }) {
   };
 
   const handleSelectAllChange = async (roleId, checked) => {
-    if (preventSpam('slectAll_permission', 2000)) return;
+    if (preventSpam('slectAll_permission', 100)) return;
     const originalPermissions = { ...(matrix[roleId] || {}) };
 
     const optimisticMatrix = JSON.parse(JSON.stringify(matrix));
@@ -207,6 +209,7 @@ export default function UserPermissionCard({ label, subject, desc }) {
             <Divider sx={{ mb: 1 }} />
 
             {roles.map((role, index) => {
+              console.log('role id',role)
               const isAllSelected = permissions.length > 0 && permissions.every((perm) => !!matrix?.[role.id]?.[perm.action]);
 
               return (

@@ -5,7 +5,7 @@ import LoaderAdmin from './LoaderVip';
 
 const RequireAuth = ({ children }) => {
   const { user, loading } = useAuthStore();
-
+  console.log('user.roles', user);
   if (loading) return <LoaderAdmin />;
 
   // // ✅ Không có user => về login
@@ -14,12 +14,13 @@ const RequireAuth = ({ children }) => {
   // }
   
   // // ✅ Check ít nhất 1 role có canAccess: true
-  // const hasAccess = (user.roles || []).some(role => role.canAccess === true);
+  console.log('user.roles', user);
+  const hasAccess = (user.roles || []).some(role => role.canAccess === true);
   
-  // if (!hasAccess) {
-  //   return <Navigate to="/403" replace />;
-  //   // Hoặc bạn muốn về 403 thì đổi: <Navigate to="/403" replace />
-  // }
+  if (!hasAccess) {
+    return <Navigate to="/403" replace />;
+    // Hoặc bạn muốn về 403 thì đổi: <Navigate to="/403" replace />
+  }
 
   return children;
 };

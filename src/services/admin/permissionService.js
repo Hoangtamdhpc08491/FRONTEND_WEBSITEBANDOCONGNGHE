@@ -20,6 +20,7 @@ export const permissionsService = {
     return get(`${base}${API_ENDPOINT.admin.permissions.ActForSubject}/${subject}`);
   },
   updatePermission: (payload) => {
+    console.log('payload',payload)
     return post(`${base}${API_ENDPOINT.admin.permissions.updatePerm}`, payload);
   },
   getPermissionsByRole: (roleId) => {

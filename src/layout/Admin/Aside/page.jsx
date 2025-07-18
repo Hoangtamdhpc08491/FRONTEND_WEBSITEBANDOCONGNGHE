@@ -24,7 +24,8 @@ import {
   HistoryOutlined,
   SafetyCertificateOutlined,
   ToolOutlined,
-  SettingOutlined
+  SettingOutlined,
+  InboxOutlined
 } from '@ant-design/icons';
 
 const icons = {
@@ -52,7 +53,8 @@ const icons = {
   HistoryOutlined,
   SafetyCertificateOutlined,
   ToolOutlined,
-  SettingOutlined
+  SettingOutlined,
+  InboxOutlined
 };
 
 const pages = [
@@ -83,6 +85,16 @@ const pages = [
         type: 'item',
         url: '/admin/products',
         icon: icons.ShoppingOutlined,
+        breadcrumbs: false,
+        action: 'read',
+        subject: 'Product'
+      },
+      {
+        id: 'sku-list',
+        title: 'Sản phẩm tồn kho',
+        type: 'item',
+        url: '/admin/skulist',
+        icon: icons.InboxOutlined,
         breadcrumbs: false,
         action: 'read',
         subject: 'Product'
@@ -157,7 +169,7 @@ const pages = [
     type: 'collapse',
     icon: icons.ThunderboltOutlined,
     action: 'read',
-    subject: 'flashSale',
+    subject: 'FlashSale',
     children: [
       {
         id: 'flash-sale-list',
@@ -167,7 +179,7 @@ const pages = [
         icon: icons.DollarOutlined,
         breadcrumbs: false,
         action: 'read',
-        subject: 'flashSale'
+        subject: 'FlashSale'
       },
       {
         id: 'flash-sale-create',
@@ -177,7 +189,7 @@ const pages = [
         icon: icons.PercentageOutlined,
         breadcrumbs: false,
         action: 'create',
-        subject: 'flashSale'
+        subject: 'FlashSale'
       }
     ]
   },
@@ -211,7 +223,7 @@ const pages = [
     type: 'collapse',
     icon: icons.PercentageOutlined,
     action: 'read',
-    subject: 'coupon',
+    subject: 'Coupon',
     children: [
       {
         id: 'coupon-list',
@@ -221,7 +233,7 @@ const pages = [
         icon: icons.TagsOutlined,
         breadcrumbs: false,
         action: 'read',
-        subject: 'coupon'
+        subject: 'Coupon'
       },
       {
         id: 'coupon-add',
@@ -231,7 +243,7 @@ const pages = [
         icon: icons.EditOutlined,
         breadcrumbs: false,
         action: 'create',
-        subject: 'coupon'
+        subject: 'Coupon'
       }
     ]
   },
@@ -298,7 +310,7 @@ const pages = [
     icon: icons.UserOutlined,
     url: '/admin/users',
     action: 'read',
-    subject: 'user',
+    subject: 'User',
     children: [
       {
         id: 'user-list',
@@ -309,7 +321,7 @@ const pages = [
         exact: false,
         activeMenu: '/admin/users',
         action: 'read',
-        subject: 'user'
+        subject: 'User'
       },
       {
         id: 'user-add',
@@ -319,7 +331,7 @@ const pages = [
         icon: icons.UserAddOutlined,
         exact: true,
         action: 'create',
-        subject: 'user'
+        subject: 'User'
       }
     ]
   },
@@ -331,7 +343,7 @@ const pages = [
     type: 'collapse',
     icon: icons.BellOutlined,
     action: 'read',
-    subject: 'notification',
+    subject: 'Notification',
     children: [
       {
         id: 'notification-list',
@@ -341,7 +353,7 @@ const pages = [
         icon: icons.BellOutlined,
         breadcrumbs: false,
         action: 'read',
-        subject: 'notification'
+        subject: 'Notification'
       },
       {
         id: 'notification-create',
@@ -351,7 +363,7 @@ const pages = [
         icon: icons.EditOutlined,
         breadcrumbs: false,
         action: 'create',
-        subject: 'notification'
+        subject: 'Notification'
       }
     ]
   },
@@ -365,7 +377,7 @@ const pages = [
     icon: icons.CommentOutlined,
     breadcrumbs: false,
     action: 'read',
-    subject: 'comment'
+    subject: 'Comment'
   },
   {
     id: 'productqna',
