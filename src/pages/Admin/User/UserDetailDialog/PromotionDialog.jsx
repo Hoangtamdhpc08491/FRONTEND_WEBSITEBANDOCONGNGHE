@@ -82,6 +82,7 @@ export default function RoleSelectDialog({ open, onClose, onApply, defaultSelect
   // Xử lý khi nhấn nút "Áp dụng"
   const handleApply = () => {
     onApply(selectedIds);
+    debugger
     onClose();
   };
   console.log(user)

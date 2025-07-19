@@ -453,8 +453,8 @@ const pages = [
     url: '/admin/system-settings',
     icon: icons.SettingOutlined,
     breadcrumbs: false,
-    action: 'create',
-    subject: 'Role'
+    action: 'read',
+    subject: 'SystemSettings'
   },
   // ===== NEW – Payment & Shipping =====
 {
