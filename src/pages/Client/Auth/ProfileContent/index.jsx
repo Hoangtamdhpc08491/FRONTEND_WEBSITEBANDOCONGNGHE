@@ -384,10 +384,12 @@ const yearOptions = Array.from({ length: 83 }, (_, i) => {
             </div>
 
            
-            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] items-start gap-2 sm:gap-4">
-              <label htmlFor="phone" className="text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:pr-2 pt-2.5">
-                Số điện thoại
-              </label>
+            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] items-center gap-2 sm:gap-4">
+
+         <label className="text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:pr-2 pt-2.5">
+  Số điện thoại
+</label>
+
               {isEditingPhone ? (
                 <div>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -414,16 +416,17 @@ const yearOptions = Array.from({ length: 83 }, (_, i) => {
                 </div>
               ) : (
                 <div className="flex items-center pt-1.5">
-                  <p className="text-sm text-gray-800 dark:text-gray-200 mr-3 truncate font-medium">
-                    {formData.phone ? maskPhoneNumber(formData.phone) : 'Chưa cập nhật'}
-                  </p>
+                 <p className="text-sm text-gray-800 dark:text-gray-200 mr-3 truncate font-medium pt-1">
+  {formData.phone ? maskPhoneNumber(formData.phone) : 'Chưa cập nhật'}
+</p>
+
                   <button
                     type="button"
                     onClick={() => {
                       setInitialFormData(JSON.parse(JSON.stringify(formData)));
                       setIsEditingPhone(true);
                     }}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-500 flex-shrink-0"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-500 flex-shrink-0 pt-1"
                     disabled={isSubmitting}
                   >
                     {formData.phone ? 'Thay Đổi' : 'Thêm'}
@@ -528,7 +531,7 @@ const yearOptions = Array.from({ length: 83 }, (_, i) => {
                 </div>
               ) : (
                 <div className="flex items-center pt-1.5">
-                  <p className="text-sm text-gray-800 dark:text-gray-200 mr-3 font-medium">
+                 <p className="text-sm text-gray-800 dark:text-gray-200 mr-3 font-medium pt-1">
                     {formData.birthDate.day && formData.birthDate.month && formData.birthDate.year
                       ? `${String(formData.birthDate.day).padStart(2, '0')}/${String(formData.birthDate.month).padStart(2, '0')}/${formData.birthDate.year}`
                       : 'Chưa cập nhật'}
