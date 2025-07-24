@@ -14,18 +14,18 @@ import { useSystemSetting } from '@/contexts/SystemSettingContext';
 import FeatureBar from './FeatureBar';
 import socket from '../../../socket'; // realtime
 import ImageSearchBox from '@/components/common/ImageSearchBox';
-import  useAuthStore  from "../../../stores/AuthStore";
+import useAuthStore from '../../../stores/AuthStore';
 
 const Header = () => {
   const navigate = useNavigate();
-const { user, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
-const userInfo = user
-  ? {
-      fullName: user.fullName || '',
-      avatarUrl: user.avatarUrl || null,
-    }
-  : null;
+  const userInfo = user
+    ? {
+        fullName: user.fullName || '',
+        avatarUrl: user.avatarUrl || null
+      }
+    : null;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -40,6 +40,7 @@ const userInfo = user
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const accountDropdownTimerRef = useRef(null);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [isConfirmLogoutModalOpen, setIsConfirmLogoutModalOpen] = useState(false); // <-- THÊM DÒNG NÀY
 
   const handleAccountDropdownEnter = () => {
     clearTimeout(accountDropdownTimerRef.current);
@@ -88,15 +89,15 @@ const userInfo = user
     window.addEventListener('cartUpdated', handleCartUpdated);
     return () => window.removeEventListener('cartUpdated', handleCartUpdated);
   }, []);
-useEffect(() => {
-  socket.on('new-client-notification', (newNoti) => {
-    setNotifications((prev) => [newNoti, ...prev]);
-  });
+  useEffect(() => {
+    socket.on('new-client-notification', (newNoti) => {
+      setNotifications((prev) => [newNoti, ...prev]);
+    });
 
-  return () => {
-    socket.off('new-client-notification');
-  };
-}, []);
+    return () => {
+      socket.off('new-client-notification');
+    };
+  }, []);
   useEffect(() => {
     const fetchCombinedCategories = async () => {
       try {
@@ -108,7 +109,7 @@ useEffect(() => {
             const standardizedItem = {
               id: item.id,
               name: item.name,
-          
+
               slug: item.slug,
               parent_id: parentId,
               imageUrl: item.thumbnail,
@@ -141,18 +142,18 @@ useEffect(() => {
     const intervalId = setInterval(fetchCombinedCategories, 300000);
     return () => clearInterval(intervalId);
   }, []);
-useEffect(() => {
-  const fetchUserInfo = async () => {
-    try {
-      const response = await authService.getUserInfo();
-      const user = response.data?.user || {};
-      useAuthStore.getState().login(user); // ✅ Gọi hàm login có sẵn trong store
-    } catch (err) {
-      console.error('Lỗi lấy thông tin người dùng:', err);
-    }
-  };
-  fetchUserInfo();
-}, []);
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await authService.getUserInfo();
+        const user = response.data?.user || {};
+        useAuthStore.getState().login(user);
+      } catch (err) {
+        console.error('Lỗi lấy thông tin người dùng:', err);
+      }
+    };
+    fetchUserInfo();
+  }, []);
 
   const getDisplayName = (fullName, maxLength = 8) => {
     if (!fullName) return '';
@@ -190,12 +191,19 @@ useEffect(() => {
     };
   }, []);
 
-const handleLogout = async () => {
-  await logout();
-  
-};
+  const toggleConfirmLogoutModal = () => {
+    setIsConfirmLogoutModalOpen(!isConfirmLogoutModalOpen);
+  };
 
+  const handleLogout = async () => {
+    setIsConfirmLogoutModalOpen(true);
+  };
 
+  const confirmLogout = async () => {
+    toggleConfirmLogoutModal();
+    await logout();
+    navigate('/');
+  };
 
   const handleOutsideClick = (e) => {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -214,11 +222,10 @@ const handleLogout = async () => {
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [topLevelDesktopCategories, setTopLevelDesktopCategories] = useState([]);
   const [mobileCategoryTree, setMobileCategoryTree] = useState([]);
-  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false); // Desktop notification dropdown
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const notificationDropdownTimerRef = useRef(null);
   const notificationButtonRef = useRef(null);
 
-  // Định nghĩa lại các hàm handleMenuEnter và handleMenuLeave
   const handleMenuEnter = () => {
     clearTimeout(categoryMenuTimerRef.current);
     setIsCategoryMenuOpen(true);
@@ -229,7 +236,6 @@ const handleLogout = async () => {
       setIsCategoryMenuOpen(false);
     }, 200);
   };
-  // Kết thúc định nghĩa lại
 
   const buildCategoryTree = (categories, parentId = null) => {
     return categories
@@ -344,10 +350,7 @@ const handleLogout = async () => {
                 </div>
               </div>
               <div className="flex items-center gap-x-1 flex-shrink-0">
-                <button
-                  className="p-1 text-white relative"
-                  onClick={toggleNotificationModal}
-                >
+                <button className="p-1 text-white relative" onClick={toggleNotificationModal}>
                   <Bell className="w-6 h-6" strokeWidth={1.8} />
                   {unreadCount > 0 && (
                     <span
@@ -379,17 +382,16 @@ const handleLogout = async () => {
                     <LayoutGrid className={`w-5 h-5 stroke-[1.8px] ${isCategoryMenuOpen ? 'text-primary' : 'text-white'}`} />
                     <span className={`text-sm font-semibold ${isCategoryMenuOpen ? 'text-primary' : 'text-white'}`}>Danh mục</span>
                   </button>
-                 <div className="absolute z-[9999] left-0 top-full">
-  <CategoryMenu
-    topLevelCategories={topLevelDesktopCategories}
-    allCategories={flatCategoriesFromAPI}
-    isOpen={isCategoryMenuOpen}
-  />
-</div>
-
+                  <div className="absolute z-[9999] left-0 top-full">
+                    <CategoryMenu
+                      topLevelCategories={topLevelDesktopCategories}
+                      allCategories={flatCategoriesFromAPI}
+                      isOpen={isCategoryMenuOpen}
+                    />
+                  </div>
                 </div>
               </div>
-               <ImageSearchBox />
+              <ImageSearchBox />
               <div className="flex items-center gap-3 flex-shrink-0">
                 <Link to="orderlookup">
                   <button className="flex flex-col items-center gap-1 px-2 py-2 rounded-lg hover-primary transition-all">
@@ -524,7 +526,6 @@ const handleLogout = async () => {
       <MobileCategoryPanel isOpen={isMobilePanelOpen} onClose={toggleMobilePanel} categories={mobileCategoryTree} />
       <PopupModal isOpen={isLoginPopupOpen} onClose={toggleLoginPopup} />
 
-  
       {isNotificationModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative flex flex-col">
@@ -546,6 +547,55 @@ const handleLogout = async () => {
           </div>
         </div>
       )}
+{isConfirmLogoutModalOpen && (
+    <div
+        className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[1000]"
+        onClick={toggleConfirmLogoutModal}
+    >
+        <div
+            className="bg-white rounded-2xl shadow-xl w-full max-w-sm relative flex flex-col p-8 md:p-10 text-center animate-fade-in-scale"
+            onClick={(e) => e.stopPropagation()}
+        >
+            <button
+                onClick={toggleConfirmLogoutModal}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors duration-200"
+                aria-label="Đóng"
+            >
+                <X size={24} strokeWidth={2} />
+            </button>
+
+            <div className="mb-4">
+                <CircleUserRound size={48} className="text-gray-500 mx-auto" strokeWidth={1.5}/>
+            </div>
+
+            <h2 className="text-2xl font-semibold text-gray-900 mb-3">Xác nhận đăng xuất</h2>
+
+            <p className="text-base text-gray-700 mb-8 leading-relaxed">
+                Bạn có chắc chắn muốn đăng xuất khỏi tài khoản của mình không?
+                Tất cả các phiên làm việc hiện tại sẽ bị chấm dứt.
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <button
+                    onClick={toggleConfirmLogoutModal}
+                    // ✅ Nút Hủy bỏ: Hover nền xám, viền xám, chữ giữ màu xám đậm
+                    className="flex-1 px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium text-lg
+                               hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200 ease-in-out"
+                >
+                    Hủy bỏ
+                </button>
+                <button
+                    onClick={confirmLogout}
+                    // ✅ Nút Đăng xuất: Hover opacity 90
+                    className="flex-1 px-5 py-2.5 bg-primary text-white rounded-lg font-medium text-lg
+                               hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                >
+                    Đăng xuất
+                </button>
+            </div>
+        </div>
+    </div>
+)}
     </>
   );
 };

@@ -31,7 +31,8 @@ export default function AuthHeader() {
           {pageTitle && (
             <>
               <span className="mx-2 sm:mx-3 text-neutral-400">|</span>
-              <h2 className="text-xl text-neutral-700 font-semibold truncate">{pageTitle}</h2>
+             <h2 className="text-base text-primary font-medium truncate">{pageTitle}</h2>
+
             </>
           )}
         </div>

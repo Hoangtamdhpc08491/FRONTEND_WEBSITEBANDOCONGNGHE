@@ -129,7 +129,7 @@ const ForgotPasswordNotice = () => {
           <span className="text-blue-600 font-semibold block mt-1">{email}</span>
         </p>
         <p className="text-gray-600 mt-2">
-          Không nhận được? Vui lòng kiểm tra thư mục <strong>'Spam'</strong> hoặc <strong>'Junk'</strong>.
+          Không nhận được? Vui lòng kiểm tra thư mục <strong>'Spam'</strong>.
         </p>
 
         <GradientButton
