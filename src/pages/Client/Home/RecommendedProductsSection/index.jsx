@@ -114,22 +114,9 @@ const RecommendedProductsSection = ({ userId, currentProductId = null }) => {
         )`
     };
 
-    if (loading) {
-        return (
-            <section
-                className="p-4 rounded-lg shadow-md my-8"
-                style={geminiGradientStyle}
-            >
-                <h2 className="flex items-center text-2xl font-bold mb-4 gap-2 text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 1080 1080" fill="none">
-                        <path d="M515.09 725.824L472.006 824.503C455.444 862.434 402.954 862.434 386.393 824.503L343.308 725.824C304.966 638.006 235.953 568.104 149.868 529.892L31.2779 477.251C-6.42601 460.515 -6.42594 405.665 31.2779 388.929L146.164 337.932C234.463 298.737 304.714 226.244 342.401 135.431L386.044 30.2693C402.239 -8.75637 456.159 -8.75646 472.355 30.2692L515.998 135.432C553.685 226.244 623.935 298.737 712.234 337.932L827.121 388.929C864.825 405.665 864.825 460.515 827.121 477.251L708.53 529.892C622.446 568.104 553.433 638.006 515.09 725.824Z" fill="white"></path>
-                    </svg>
-                    Sản phẩm gợi ý cho bạn
-                </h2>
-
-                <div className="text-center py-8 text-white">Đang tải gợi ý...</div>
-            </section>
-        );
+    if (loading && validRecommendations.length === 0) {
+        // Hoàn toàn không hiển thị gì khi đang tải và chưa có gợi ý nào hợp lệ
+        return null;
     }
 
     if (error) {
@@ -149,13 +136,13 @@ const RecommendedProductsSection = ({ userId, currentProductId = null }) => {
         );
     }
 
-    if (validRecommendations.length === 0) {
+    if (validRecommendations.length === 0) { // Chỉ ẩn nếu không có recommendations SAU KHI đã tải xong
         return null;
     }
 
     return (
         <section
-            className="p-2 rounded-lg shadow-md my-8" // Giữ nguyên p-4 cho tổng thể padding section
+            className="p-2 rounded-lg shadow-md my-8"
             style={geminiGradientStyle}
         >
             <h2 className="flex items-center text-2xl font-bold mb-4 gap-2 text-white">
@@ -164,7 +151,7 @@ const RecommendedProductsSection = ({ userId, currentProductId = null }) => {
                 </svg>
                 Sản phẩm gợi ý cho bạn
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2"> {/* Adjusted gap-x and gap-y to a consistent gap-3 */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                 {validRecommendations.map((product) => (
                     <div
                         key={product.id}
@@ -180,16 +167,15 @@ const RecommendedProductsSection = ({ userId, currentProductId = null }) => {
                             )}
 
                             {product.discount > 0 && (
-                                <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] sm:text-xs font-bold px-1.5 py-0.5 rounded z-25"> {/* Changed z-index to 30 */}
+                                <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] sm:text-xs font-bold px-1.5 py-0.5 rounded z-25">
                                     -{product.discount}%
                                 </div>
                             )}
 
                             <Link
                                 to={`/product/${product.slug}`}
-                                // Adjusted image height for taller cards
                                 className="product-card-image-link block w-full h-[140px] xs:h-[160px] sm:h-[180px] md:h-[180px] mt-3 mb-1.5 sm:mt-4 sm:mb-2
-                                         flex items-center justify-center px-3 relative"
+                                             flex items-center justify-center px-3 relative"
                             >
                                 <div className="relative w-full h-full flex items-center justify-center">
                                     <img
@@ -203,10 +189,9 @@ const RecommendedProductsSection = ({ userId, currentProductId = null }) => {
                                         <img
                                             src={constructImageUrl(product.badgeImage)}
                                             alt="badge overlay"
-                                            // Apply adjusted classes here
                                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                                                        w-full h-full object-contain z-20 pointer-events-none select-none
-                                                        transform scale-[1.15]"
+                                                     w-full h-full object-contain z-20 pointer-events-none select-none
+                                                     transform scale-[1.15]"
                                             loading="lazy"
                                         />
                                     )}
@@ -254,7 +239,7 @@ const RecommendedProductsSection = ({ userId, currentProductId = null }) => {
                                 <div className="pt-1.5">
                                     <div className="product-card-meta flex items-center justify-between mb-1.5 sm:mb-2 min-h-[18px]">
                                         <div className="flex items-center gap-x-1 sm:gap-x-1.5 text-[10px] sm:text-[10.5px] text-gray-600">
-                                            {renderStars(product.averageRating, product.id)} {/* Sử dụng product.averageRating */}
+                                            {renderStars(product.averageRating, product.id)}
                                         </div>
 
                                         {product.inStock && product.soldCount > 0 && (
