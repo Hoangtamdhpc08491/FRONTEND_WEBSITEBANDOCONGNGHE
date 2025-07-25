@@ -10,7 +10,8 @@ export const orderService = {
   },
 
   getById: (id) => {
-    const url = `${base}${API_ENDPOINT.admin.order.getById.replace(':id', id)}`;
+ const url = `${base}${API_ENDPOINT.admin.order.getById(id)}`;
+
     console.log(`📡 Gọi API chi tiết đơn hàng: ${url}`);
     return get(url);
   },

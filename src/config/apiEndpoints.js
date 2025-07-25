@@ -142,7 +142,7 @@ export const API_ENDPOINT = {
       byCategory: '/theo-danh-muc',
       calculateFee: '/calculate-fee'
     },
- search: {
+    search: {
       base: `${API_BASE_URL}`,
       search: '/search-by-image',
       history: '/search/history',
@@ -220,7 +220,7 @@ export const API_ENDPOINT = {
       roll: '/roll',
       history: '/history',
       claimTask: '/task'
-    },
+    }
   },
   admin: {
     permissions: {
@@ -268,19 +268,19 @@ export const API_ENDPOINT = {
       updateOrderIndexBulk: '/product/update-order'
     },
     product: {
-      base: `${API_BASE_URL}/admin`,
-      create: '/product/create',
-      list: '/product/list',
+      base: `${API_BASE_URL}/admin/products`,
+      create: '/create',
+      list: '/list',
       getCategoryTree: '/categories/tree',
       getBrandList: '/brands/list',
-      getById: (slug) => `/product/${slug}`,
-      forceDeleteMany: '/product/force-delete-many',
-      softDelete: (id) => `/product/soft/${id}`,
-      softDeleteMany: '/product/soft-delete-many',
-      restore: (id) => `/product/restore/${id}`,
-      restoreMany: '/product/restore-many',
-      forceDelete: (id) => `/product/force/${id}`,
-      updateOrderIndexBulk: '/product/update-order'
+      getById: (slug) => `/${slug}`,
+      forceDeleteMany: '/force-delete-many',
+      softDelete: (id) => `/soft/${id}`,
+      softDeleteMany: '/soft-delete-many',
+      restore: (id) => `/restore/${id}`,
+      restoreMany: '/restore-many',
+      forceDelete: (id) => `/force/${id}`,
+      updateOrderIndexBulk: '/update-order'
     },
     notification: {
       base: `${API_BASE_URL}/admin/notifications`,
@@ -335,14 +335,15 @@ export const API_ENDPOINT = {
       forceDeleteMany: '/coupon/force-delete-many'
     },
 
-    order: {
-      base: `${API_BASE_URL}/admin`,
-      list: '/order/list',
-      getById: '/order/:id',
-      updateStatus: (id) => `/order/${id}/status`,
-      cancel: (id) => `/order/${id}/cancel`,
-      updatePaymentStatus: (id) => `/order/${id}/payment-status`
-    },
+   order: {
+  base: `${API_BASE_URL}/admin/order`,
+  list: '/list',
+  getById: (id) => `/detail/${id}`,
+  updateStatus: (id) => `/update-status/${id}`,
+  cancel: (id) => `/cancel/${id}`,
+  updatePaymentStatus: (id) => `/update-payment-status/${id}`
+}
+,
     returnRefund: {
       base: `${API_BASE_URL}/admin`,
       getReturnsByOrder: (orderId) => `/order/${orderId}/returns`, // GET
@@ -378,19 +379,17 @@ export const API_ENDPOINT = {
       getAllProducts: '/sections/products'
     },
     banner: {
-      base: `${API_BASE_URL}/admin`,
-      list: '/banners',
-      create: '/banners',
-      getById: (slug) => `/banners/${slug}`,
-      update: (slug) => `/banners/${slug}`,
-
-      delete: (id) => `/banners/${id}`,
-      forceDeleteMany: '/banners/force-delete',
-      updateOrder: (id) => `/banners/${id}/update-order`,
-      categoriesForSelect: '/banners/categories-for-select',
-      productsForSelect: '/banners/products-for-select'
+      base: `${API_BASE_URL}/admin/banners`,
+      list: '/list',
+      create: '/create',
+      getById: (slug) => `/detail/${slug}`,
+      update: (slug) => `/update/${slug}`,
+      delete: (id) => `/delete/${id}`,
+      forceDeleteMany: '/force-delete-many',
+      updateOrder: (id) => `/update-order/${id}`,
+      categoriesForSelect: '/categories-for-select',
+      productsForSelect: '/products-for-select'
     },
-
     variantValue: {
       base: `${API_BASE_URL}/admin`,
       getByVariantId: (id) => `/variant-values/${id}`,
@@ -407,37 +406,30 @@ export const API_ENDPOINT = {
     },
 
     highlightedCategoryItem: {
-      base: `${API_BASE_URL}/admin`,
-      list: '/highlighted-category-items/list',
-      create: '/highlighted-category-items',
-      update: (slug) => `/highlighted-category-items/${slug}`,
-      getBySlug: (slug) => `/highlighted-category-items/${slug}`,
-
-      delete: (id) => `/highlighted-category-items/${id}`,
-      deleteMany: '/highlighted-category-items/delete-many',
-      getCategories: '/highlighted-category-items/categories/list',
-      reorder: '/highlighted-category-items/reorder'
+      base: `${API_BASE_URL}/admin/highlighted-category-item`,
+      list: '/list',
+      create: '/',
+      update: (slug) => `/${slug}`,
+      getBySlug: (slug) => `/${slug}`,
+      delete: (id) => `/${id}`,
+      deleteMany: '/delete-many',
+      getCategories: '/categories/list',
+      reorder: '/reorder'
     },
-
     flashSale: {
-      base: `${API_BASE_URL}/admin`,
-      list: '/flash-sales',
-      create: '/flash-sales',
-      update: (slug) => `/flash-sales/${slug}`,
-      getById: (slug) => `/flash-sales/${slug}`,
-      delete: (id) => `/flash-sales/${id}`,
-      deleteMany: '/flash-sales/delete-many',
-      updateSortOrder: (slug) => `/flash-sales/${slug}/items/sort-order`,
-      softDelete: (id) => `/flash-sales/soft-delete/${id}`,
-      softDeleteMany: '/flash-sales/soft-delete-many',
-      restore: (id) => `/flash-sales/restore/${id}`,
-      restoreMany: '/flash-sales/restore-many',
-
-      forceDelete: (id) => `/flash-sales/force/${id}`,
-      forceDeleteMany: '/flash-sales/force-delete-many',
-
-      getSkus: '/flash-sales/skus/available',
-      getCategories: '/flash-sales/categories/available-tree'
+      base: `${API_BASE_URL}/admin/flash-sales`,
+      list: '/list',
+      create: '/create',
+      update: (slug) => `/update/${slug}`,
+      getById: (slug) => `/detail/${slug}`,
+      softDelete: (id) => `/soft-delete/${id}`,
+      softDeleteMany: '/soft-delete-many',
+      restore: (id) => `/restore/${id}`,
+      restoreMany: '/restore-many',
+      forceDelete: (id) => `/force/${id}`,
+      forceDeleteMany: '/force-delete-many',
+      getSkus: '/skus/available',
+      getCategories: '/categories/available-tree'
     },
     user: {
       base: `${API_BASE_URL}/admin`,
@@ -516,7 +508,7 @@ export const API_ENDPOINT = {
       create: '/create',
       update: (id) => `/${id}`,
       delete: (id) => `/${id}`,
-      getById: (id) => get(`${base}/${id}`),
+      getById: (id) => get(`${base}/${id}`)
     },
     spinHistory: {
       base: `${API_BASE_URL}/admin/spin-history`,

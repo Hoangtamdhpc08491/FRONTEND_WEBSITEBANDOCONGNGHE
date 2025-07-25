@@ -411,14 +411,16 @@ const HorizontalProductSlider = ({ productsInput = [], imageBannerUrl, targetCou
                             // Dùng TailwindCSS responsive để tự động căn chỉnh số cột
                             <div className="flex flex-wrap justify-start items-stretch -mx-1">
                                 {productsInput.map((product) => (
-                                    <div
-                                        key={product.id}
-                                        className="w-full px-1 mb-2 
-                                            xs:w-1/2 
-                                            sm:w-1/3 
-                                            lg:w-1/4 
-                                            xl:w-1/5" // Đảm bảo phân bổ hợp lý theo màn hình
-                                    >
+                                   <div
+  key={product.id}
+  className="w-1/2 px-1 mb-2 
+    xs:w-1/2 
+    sm:w-1/3 
+    md:w-1/3 
+    lg:w-1/4 
+    xl:w-1/5"
+>
+
                                         <InlinedProductCard {...product} saleStatus={saleStatus} />
                                     </div>
                                 ))}

@@ -5,6 +5,7 @@ import { API_BASE_URL } from '../../../../constants/environment';
 import Loader from '../../../../components/common/Loader';
 import GradientButton from '../../../../components/Client/GradientButton';
 import Select from 'react-select';
+import useAuthStore from '../../../../stores/AuthStore';
 
 const SuccessModal = ({ isOpen, message, onClose }) => {
   useEffect(() => {
@@ -244,6 +245,8 @@ const ProfileContent = () => {
           : `${cleanedApiBaseUrl}${updatedUser.avatarUrl.startsWith('/') ? updatedUser.avatarUrl.substring(1) : updatedUser.avatarUrl}?_=${new Date().getTime()}`;
         setUserAvatarPreview(finalAvatarUrl);
         window.dispatchEvent(new CustomEvent('avatarUpdated', { detail: finalAvatarUrl }));
+useAuthStore.getState().login(updatedUser); 
+
       } else {
         setUserAvatarPreview(null);
         window.dispatchEvent(new CustomEvent('avatarUpdated', { detail: null }));

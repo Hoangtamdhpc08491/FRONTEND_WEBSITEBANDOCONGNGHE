@@ -190,16 +190,18 @@ export const CouponCard = ({
       ))}
 
       <div className="flex-1 flex flex-col justify-between pl-6">
-        <div className="flex items-start justify-between">
-        <p
-          className={`font-semibold text-sm text-gray-900 truncate
-            ${titleClassName}
-            ${notAllowed ? 'text-gray-500' : ''} {/* Thêm dòng này để text mờ đi khi không đủ điều kiện */}
-          `}        >
-            {promo.title}
-          </p>
-          <FiInfo size={16} className="text-gray-400 flex-shrink-0 ml-1" />
-        </div>
+<div className="flex items-start justify-between gap-2">
+  <div className="flex-1 min-w-0">
+    <p
+      className={`font-semibold text-sm text-gray-900 truncate ${titleClassName} ${notAllowed ? 'text-gray-500' : ''}`}
+    >
+      {promo.title}
+    </p>
+  </div>
+  <FiInfo size={16} className="text-gray-400 flex-shrink-0 mt-0.5" />
+</div>
+
+
         <p className="text-xs text-gray-600">
           {promo.description}
           {/* Giữ lại dòng "Đã hết lượt sử dụng" */}
