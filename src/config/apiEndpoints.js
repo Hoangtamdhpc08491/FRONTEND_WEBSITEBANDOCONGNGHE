@@ -424,6 +424,7 @@ export const API_ENDPOINT = {
       softDelete: (id) => `/soft-delete/${id}`,
       softDeleteMany: '/soft-delete-many',
       restore: (id) => `/restore/${id}`,
+      updateOrder: '/update-order',
       restoreMany: '/restore-many',
       forceDelete: (id) => `/force/${id}`,
       forceDeleteMany: '/force-delete-many',
