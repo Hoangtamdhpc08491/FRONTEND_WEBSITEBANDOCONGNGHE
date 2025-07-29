@@ -258,7 +258,6 @@ export const API_ENDPOINT = {
       getAll: '/',
       logsBySkuId: (id) => `/${id}/logs`,
       importStock: (id) => `/${id}/import`,
-      // getById: (slug) => `/product/${slug}`,
       exportStock: (id) => `/${id}/export`,
       softDelete: (id) => `/product/soft/${id}`,
       softDeleteMany: '/product/soft-delete-many',
@@ -335,23 +334,23 @@ export const API_ENDPOINT = {
       forceDeleteMany: '/coupon/force-delete-many'
     },
 
-   order: {
-  base: `${API_BASE_URL}/admin/order`,
-  list: '/list',
-  getById: (id) => `/detail/${id}`,
-  updateStatus: (id) => `/update-status/${id}`,
-  cancel: (id) => `/cancel/${id}`,
-  updatePaymentStatus: (id) => `/update-payment-status/${id}`
-}
-,
+    order: {
+      base: `${API_BASE_URL}/admin/order`,
+      list: '/list',
+      getById: (id) => `/detail/${id}`,
+      updateStatus: (id) => `/update-status/${id}`,
+      cancel: (id) => `/cancel/${id}`,
+      updatePaymentStatus: (id) => `/update-payment-status/${id}`
+    }
+    ,
     returnRefund: {
       base: `${API_BASE_URL}/admin`,
-      getReturnsByOrder: (orderId) => `/order/${orderId}/returns`, // GET
-      updateReturnStatus: (id) => `/returns/${id}/status`, // PUT
-      getReturnDetail: (id) => `/returns/${id}`, // ← thêm dòng này
+      getReturnsByOrder: (orderId) => `/order/${orderId}/returns`,
+      updateReturnStatus: (id) => `/returns/${id}/status`,
+      getReturnDetail: (id) => `/returns/${id}`,
 
-      getRefundsByOrder: (orderId) => `/order/${orderId}/refunds`, // GET
-      updateRefundStatus: (id) => `/refunds/${id}/status` // PUT
+      getRefundsByOrder: (orderId) => `/order/${orderId}/refunds`,
+      updateRefundStatus: (id) => `/refunds/${id}/status`
     },
 
     variant: {
