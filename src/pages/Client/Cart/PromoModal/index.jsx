@@ -290,10 +290,10 @@ const PromoModal = ({ modalTitle = 'Hồng Ân Khuyến Mãi', onClose, onApplyS
               description: `Cho đơn hàng từ ${formatCurrencyVND(c.minOrderAmount)}`,
               expiryDate: c.expiryDate
                 ? new Date(c.expiryDate).toLocaleDateString('vi-VN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: '2-digit'
-                  })
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: '2-digit'
+                })
                 : null,
               isApplicable: c.isApplicable,
               // Vẫn truyền totalQuantity và usedCount xuống CouponCard
@@ -323,9 +323,21 @@ const PromoModal = ({ modalTitle = 'Hồng Ân Khuyến Mãi', onClose, onApplyS
 
   const groupedPromos = availablePromos.reduce((acc, p) => {
     const key = p.type === 'shipping' ? 'Mã Vận Chuyển' : 'Mã Giảm Giá';
-    (acc[key] = acc[key] || []).push(p);
+    if (!acc[key]) acc[key] = [];
+
+    acc[key].push(p);
+
     return acc;
   }, {});
+
+
+  Object.keys(groupedPromos).forEach((key) => {
+    groupedPromos[key] = groupedPromos[key].sort((a, b) => {
+
+      return Number(b.isApplicable) - Number(a.isApplicable);
+    });
+  });
+
 
   const toggleGroup = (g) => setExpandedGroups((s) => ({ ...s, [g]: !s[g] }));
 
