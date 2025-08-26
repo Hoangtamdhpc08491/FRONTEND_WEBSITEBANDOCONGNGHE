@@ -16,7 +16,7 @@ const SEO = ({
   nofollow = false,
   children
 }) => {
-  const siteTitle = 'Điện Thoại Giá Kho - Cửa hàng điện thoại uy tín';
+  const siteTitle = 'Cyberzone - Mua sắm trực tuyến các sản phẩm điện tử';
   const fullTitle = title ? `${title} | ${siteTitle}` : siteTitle;
   const baseUrl = import.meta.env.VITE_APP_BASE_URL || 'https://dienthoaigiakho.vn';
   

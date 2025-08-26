@@ -23,8 +23,8 @@ function DynamicTitleUpdater() {
   const { settings } = useSystemSetting();
 
   useEffect(() => {
-    if (settings?.siteName) {
-      // đổi title
+    if (settings?.siteName && settings.siteName.trim() && settings.siteName !== "my shop 11111") {
+      // đổi title (chỉ khi có title hợp lệ và không phải "my shop 11111")
       document.title = settings.siteName;
 
       // đổi meta description
@@ -34,7 +34,7 @@ function DynamicTitleUpdater() {
         meta.name = "description";
         document.head.appendChild(meta);
       }
-      meta.content = settings.siteDescription || "Mô tả mặc định...";
+      meta.content = settings.siteDescription || "Cyberzone - Mua sắm trực tuyến các sản phẩm điện tử, điện gia dụng, và công nghệ với giá tốt nhất";
     }
   }, [settings]);
 
