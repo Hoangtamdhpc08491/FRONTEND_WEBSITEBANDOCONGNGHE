@@ -181,7 +181,7 @@ const SEOManager = () => {
         </Alert>
       )}
 
-      {/* SEO Stats */}
+      {/* SEO Stats
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">
           Thống kê SEO
@@ -230,7 +230,7 @@ const SEOManager = () => {
             </Card>
           </Grid>
         ))}
-      </Grid>
+      </Grid> */}
 
       {/* SEO Configuration */}
       <Card>
