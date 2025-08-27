@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://frontend-websitebandocongnghe-xi.vercel.app/sitemap.xml
+
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /api/
+
+# Allow important pages
+Allow: /tin-tuc/
+Allow: /san-pham/
+Allow: /lien-he/
+Allow: /gioi-thieu/
