@@ -2,6 +2,17 @@
   "buildCommand": "vite build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { 
+      "source": "/robots.txt", 
+      "destination": "https://backend-websitebandocongnghe-4rkw.onrender.com/robots.txt" 
+    },
+    { 
+      "source": "/sitemap.xml", 
+      "destination": "https://backend-websitebandocongnghe-4rkw.onrender.com/sitemap.xml" 
+    },
+    { 
+      "source": "/(.*)", 
+      "destination": "/index.html" 
+    }
   ]
 }
