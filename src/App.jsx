@@ -8,11 +8,13 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { SystemSettingProvider, useSystemSetting } from "@/contexts/SystemSettingContext";
 import { systemSettingService } from "@/services/admin/systemSettingService";
 import useAuthStore from "@/stores/AuthStore";
+import keepAliveService from "@/services/keepAliveService";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ThemeCustomization from "./themes"; 
 import Toastify from "components/common/Toastify";
 import ScrollTop from "./components/Admin/ScrollTop";
+import KeepAliveMonitor from "./components/common/KeepAliveMonitor";
 
 import "./assets/Client/css/global.css";
 import "./index.css";
@@ -48,6 +50,24 @@ function AppContent() {
     fetchUserInfo();
   }, []);
 
+  // Khởi động keep-alive service cho backend
+  useEffect(() => {
+    // Chỉ chạy trong production hoặc khi có VITE_ENABLE_KEEP_ALIVE=true
+    const shouldEnableKeepAlive = 
+      import.meta.env.PROD || 
+      import.meta.env.VITE_ENABLE_KEEP_ALIVE === 'true';
+
+    if (shouldEnableKeepAlive) {
+      console.log('🚀 Starting backend keep-alive service...');
+      keepAliveService.start();
+
+      // Cleanup khi component unmount
+      return () => {
+        keepAliveService.stop();
+      };
+    }
+  }, []);
+
   useEffect(() => {
     const fetchSystemSettings = async () => {
       try {
@@ -72,6 +92,7 @@ function AppContent() {
       <ScrollTop />
       <Toastify />
       <DynamicTitleUpdater />
+      <KeepAliveMonitor />
      
       <RouterProvider router={router} />
     </>
