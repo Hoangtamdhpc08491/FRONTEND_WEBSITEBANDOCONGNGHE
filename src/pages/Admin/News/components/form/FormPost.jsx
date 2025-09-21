@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Grid } from "@mui/material";
 import Content from "@/pages/Admin/News/components/form/Content";
 import Sidebar from "@/pages/Admin/News/components/sidebar/Sidebar";
-import SEORealtimeAnalyzerEnhanced from "@/components/Admin/SEO/SEORealtimeAnalyzerEnhanced";
+import SEORealtimeAnalyzerRankMath from "@/components/Admin/SEO/SEORealtimeAnalyzerRankMath";
 import SchemaEditor from "@/components/Admin/SEO/SchemaEditor";
 import { newsCategoryService } from "@/services/admin/newCategoryService";
 import { normalizeCategoryList } from "@/utils";
@@ -254,8 +254,8 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            {/* SEO Real-time Analyzer */}
-          <SEORealtimeAnalyzerEnhanced
+            {/* SEO Real-time Analyzer with Rank Math Logic */}
+          <SEORealtimeAnalyzerRankMath
             title={title}
             content={content}
             focusKeyword={focusKeyword}
