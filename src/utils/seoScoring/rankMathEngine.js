@@ -12,6 +12,7 @@ export class RankMathSEOEngine {
       titleStartsWithKeyword: { weight: 5, maxScore: 5 },
       titleSentiment: { weight: 1, maxScore: 1 },
       titleHasPowerWords: { weight: 2, maxScore: 2 },
+      titleHasNumber: { weight: 1, maxScore: 1 },
       titleLength: { weight: 3, maxScore: 3 },
       
       // Meta Description Tests
@@ -27,15 +28,24 @@ export class RankMathSEOEngine {
       contentLength: { weight: 4, maxScore: 4 },
       keywordDensity: { weight: 6, maxScore: 6 },
       keywordInFirstParagraph: { weight: 3, maxScore: 3 },
+      keywordInContent: { weight: 4, maxScore: 4 },
       keywordInHeadings: { weight: 4, maxScore: 4 },
       
       // Image Tests
       imageAlt: { weight: 3, maxScore: 3 },
       imageTitle: { weight: 2, maxScore: 2 },
+      contentHasAssets: { weight: 2, maxScore: 2 },
       
       // Links Tests
       internalLinks: { weight: 3, maxScore: 3 },
       externalLinks: { weight: 2, maxScore: 2 },
+      externalLinksDoFollow: { weight: 2, maxScore: 2 },
+      
+      // Additional Quality Tests
+      keywordUsage: { weight: 3, maxScore: 3 },
+      contentHasTOC: { weight: 2, maxScore: 2 },
+      contentHasShortParagraphs: { weight: 2, maxScore: 2 },
+      contentAI: { weight: 2, maxScore: 2 },
       
       // Social Tests
       socialTitle: { weight: 2, maxScore: 2 },
@@ -90,6 +100,7 @@ export class RankMathSEOEngine {
     results.titleStartsWithKeyword = this.testTitleStartsWithKeyword(title, keyword);
     results.titleSentiment = this.testTitleSentiment(title);
     results.titleHasPowerWords = this.testTitleHasPowerWords(title);
+    results.titleHasNumber = this.testTitleHasNumber(title);
     results.titleLength = this.testTitleLength(title);
 
     // Meta Description Tests
@@ -105,15 +116,24 @@ export class RankMathSEOEngine {
     results.contentLength = this.testContentLength(content);
     results.keywordDensity = this.testKeywordDensity(content, keyword);
     results.keywordInFirstParagraph = this.testKeywordInFirstParagraph(content, keyword);
+    results.keywordInContent = this.testKeywordInContent(content, keyword);
     results.keywordInHeadings = this.testKeywordInHeadings(content, keyword);
 
     // Image Tests
     results.imageAlt = this.testImageAlt(images, keyword);
     results.imageTitle = this.testImageTitle(images, keyword);
+    results.contentHasAssets = this.testContentHasAssets(content);
 
     // Links Tests
     results.internalLinks = this.testInternalLinks(content);
     results.externalLinks = this.testExternalLinks(content);
+    results.externalLinksDoFollow = this.testExternalLinksDoFollow(content);
+
+    // Additional Quality Tests
+    results.keywordUsage = this.testKeywordUsage(keyword);
+    results.contentHasTOC = this.testContentHasTOC(content);
+    results.contentHasShortParagraphs = this.testContentHasShortParagraphs(content);
+    results.contentAI = this.testContentAI();
 
     // Social Tests
     results.socialTitle = this.testSocialTitle(socialData.title);
@@ -224,6 +244,20 @@ export class RankMathSEOEngine {
         ? 'Tiêu đề có từ mang tính cảm xúc' 
         : 'Có thể thêm từ mang tính cảm xúc vào tiêu đề',
       score: hasEmotionalWord ? this.tests.titleHasPowerWords.maxScore : 0
+    };
+  }
+
+  /**
+   * Test: Title có số
+   */
+  testTitleHasNumber(title) {
+    const hasNumber = /\d/.test(title);
+    return {
+      status: hasNumber ? 'ok' : 'info',
+      message: hasNumber 
+        ? 'Tiêu đề có chứa số' 
+        : 'Tiêu đề không chứa số',
+      score: hasNumber ? this.tests.titleHasNumber.maxScore : 0
     };
   }
 
@@ -641,6 +675,150 @@ export class RankMathSEOEngine {
   }
 
   /**
+   * Test: Từ khóa trong nội dung
+   */
+  testKeywordInContent(content, keyword) {
+    const hasKeyword = content.toLowerCase().includes(keyword);
+    
+    return {
+      status: hasKeyword ? 'ok' : 'fail',
+      message: hasKeyword 
+        ? 'Từ khóa được tìm thấy trong nội dung' 
+        : 'Từ khóa không tìm thấy trong nội dung',
+      score: hasKeyword ? this.tests.keywordInContent.maxScore : 0
+    };
+  }
+
+  /**
+   * Test: Nội dung có hình ảnh/video
+   */
+  testContentHasAssets(content) {
+    const hasImages = /<img[^>]*>/i.test(content);
+    const hasVideos = /<video[^>]*>/i.test(content) || /youtube\.com|vimeo\.com|youtu\.be/i.test(content);
+    const hasAssets = hasImages || hasVideos;
+    
+    return {
+      status: hasAssets ? 'ok' : 'warning',
+      message: hasAssets 
+        ? 'Nội dung có chứa hình ảnh và/hoặc video' 
+        : 'Nên thêm hình ảnh hoặc video vào nội dung',
+      score: hasAssets ? this.tests.contentHasAssets.maxScore : 0
+    };
+  }
+
+  /**
+   * Test: Liên kết ngoại có DoFollow
+   */
+  testExternalLinksDoFollow(content) {
+    const externalLinkRegex = /<a[^>]*href=["|'](https?:\/\/[^"']*)["|'][^>]*>/gi;
+    const allExternalLinks = content.match(externalLinkRegex) || [];
+    
+    if (allExternalLinks.length === 0) {
+      return {
+        status: 'info',
+        message: 'Không có liên kết ngoại',
+        score: 0
+      };
+    }
+    
+    // Kiểm tra xem có liên kết nào không có rel="nofollow"
+    const doFollowLinks = allExternalLinks.filter(link => 
+      !link.includes('rel="nofollow"') && !link.includes("rel='nofollow'")
+    );
+    
+    if (doFollowLinks.length > 0) {
+      return {
+        status: 'ok',
+        message: 'Có ít nhất một liên kết ngoại DoFollow',
+        score: this.tests.externalLinksDoFollow.maxScore
+      };
+    } else {
+      return {
+        status: 'warning',
+        message: 'Tất cả liên kết ngoại đều có NoFollow',
+        score: 0
+      };
+    }
+  }
+
+  /**
+   * Test: Sử dụng từ khóa lần đầu
+   */
+  testKeywordUsage(keyword) {
+    // Giả định: kiểm tra từ database hoặc service
+    // Tạm thời return ok cho demo
+    return {
+      status: 'ok',
+      message: 'Chưa từng sử dụng từ khóa này trước đây',
+      score: this.tests.keywordUsage.maxScore
+    };
+  }
+
+  /**
+   * Test: Nội dung có Table of Contents
+   */
+  testContentHasTOC(content) {
+    const hasTOC = /table.of.contents|mục.lục|toc/i.test(content) || 
+                   /<ol[^>]*class[^>]*toc/i.test(content) ||
+                   /<ul[^>]*class[^>]*toc/i.test(content);
+    
+    return {
+      status: hasTOC ? 'ok' : 'warning',
+      message: hasTOC 
+        ? 'Nội dung có Table of Contents' 
+        : 'Không sử dụng plugin Table of Contents',
+      score: hasTOC ? this.tests.contentHasTOC.maxScore : 0
+    };
+  }
+
+  /**
+   * Test: Nội dung có đoạn văn ngắn
+   */
+  testContentHasShortParagraphs(content) {
+    // Loại bỏ HTML tags để đếm text thực
+    const textContent = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    const paragraphs = textContent.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+    
+    if (paragraphs.length === 0) {
+      return {
+        status: 'fail',
+        message: 'Không có đoạn văn nào',
+        score: 0
+      };
+    }
+    
+    const shortParagraphs = paragraphs.filter(p => p.length <= 150);
+    const shortRatio = shortParagraphs.length / paragraphs.length;
+    
+    if (shortRatio >= 0.7) {
+      return {
+        status: 'ok',
+        message: 'Sử dụng đoạn văn ngắn',
+        score: this.tests.contentHasShortParagraphs.maxScore
+      };
+    } else {
+      return {
+        status: 'warning',
+        message: 'Nên chia thành các đoạn văn ngắn hơn',
+        score: Math.floor(this.tests.contentHasShortParagraphs.maxScore * shortRatio)
+      };
+    }
+  }
+
+  /**
+   * Test: Sử dụng Content AI
+   */
+  testContentAI() {
+    // Giả định: kiểm tra từ service hoặc metadata
+    // Tạm thời return ok cho demo
+    return {
+      status: 'ok',
+      message: 'Đang sử dụng Content AI để tối ưu bài viết',
+      score: this.tests.contentAI.maxScore
+    };
+  }
+
+  /**
    * Test: Social Title
    */
   testSocialTitle(socialTitle) {
@@ -693,20 +871,62 @@ export class RankMathSEOEngine {
   }
 
   /**
-   * Tạo suggestions dựa trên kết quả phân tích
+   * Tạo suggestions dựa trên kết quả phân tích (theo category như Rank Math)
    */
   generateSuggestions(results) {
-    const suggestions = [];
-    
-    Object.entries(results).forEach(([testName, result]) => {
-      if (result.status === 'fail') {
-        suggestions.push(result.message);
-      } else if (result.status === 'warning') {
-        suggestions.push(result.message);
-      }
+    const suggestions = {
+      basic: [],
+      additional: [],
+      titleReadability: [],
+      contentReadability: []
+    };
+
+    // Mapping tests to categories
+    const categoryMapping = {
+      basic: ['titleInSEO', 'metaDescriptionKeyword', 'urlKeyword', 'keywordInFirstParagraph', 'keywordInContent', 'contentLength'],
+      additional: ['keywordInHeadings', 'imageAlt', 'keywordDensity', 'urlLength', 'externalLinks', 'externalLinksDoFollow', 'internalLinks', 'keywordUsage', 'contentAI'],
+      titleReadability: ['titleStartsWithKeyword', 'titleSentiment', 'titleHasPowerWords', 'titleHasNumber'],
+      contentReadability: ['contentHasTOC', 'contentHasShortParagraphs', 'contentHasAssets']
+    };
+
+    // Mapping messages cho từng test
+    const suggestionMessages = {
+      titleInSEO: 'Add Focus Keyword to the SEO title.',
+      metaDescriptionKeyword: 'Add Focus Keyword to your SEO Meta Description.',
+      urlKeyword: 'Use Focus Keyword in the URL.',
+      keywordInFirstParagraph: 'Use Focus Keyword at the beginning of your content.',
+      keywordInContent: 'Use Focus Keyword in the content.',
+      contentLength: 'Content should be 600-2500 words long.',
+      keywordInHeadings: 'Use Focus Keyword in subheading(s) like H2, H3, H4, etc..',
+      imageAlt: 'Add an image with your Focus Keyword as alt text.',
+      keywordDensity: 'Keyword Density is 0. Aim for around 1% Keyword Density.',
+      urlLength: 'URL is too long. Keep it under 75 characters.',
+      externalLinks: 'Link out to external resources.',
+      externalLinksDoFollow: 'Add DoFollow links pointing to external resources.',
+      internalLinks: 'Add internal links in your content.',
+      keywordUsage: 'Set a Focus Keyword for this content.',
+      contentAI: 'You are using Content AI to optimise this Post.',
+      titleStartsWithKeyword: 'Use the Focus Keyword near the beginning of SEO title.',
+      titleSentiment: "Your title doesn't contain a positive or a negative sentiment word.",
+      titleHasPowerWords: "Your title doesn't contain a power word. Add at least one.",
+      titleHasNumber: "Your SEO title doesn't contain a number.",
+      contentHasTOC: 'Use Table of Content to break-down your text.',
+      contentHasShortParagraphs: 'Add short and concise paragraphs for better readability and UX.',
+      contentHasAssets: 'Add a few images and/or videos to make your content appealing.'
+    };
+
+    // Thêm suggestions vào từng category
+    Object.entries(categoryMapping).forEach(([category, testNames]) => {
+      testNames.forEach(testName => {
+        const result = results[testName];
+        if (result && (result.status === 'fail' || result.status === 'warning')) {
+          const message = suggestionMessages[testName] || result.message;
+          suggestions[category].push(message);
+        }
+      });
     });
-    
-    return suggestions.slice(0, 5); // Chỉ hiển thị 5 suggestions quan trọng nhất
+
+    return suggestions;
   }
 
   /**

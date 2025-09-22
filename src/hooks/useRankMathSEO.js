@@ -11,6 +11,7 @@ export const useRankMathSEO = ({
   metaDescription = '',
   url = '',
   focusKeyword = '',
+  slug = '', // Thêm slug parameter
   images = [],
   socialData = {},
   autoAnalyze = true,
@@ -45,6 +46,7 @@ export const useRankMathSEO = ({
         metaDescription,
         url,
         focusKeyword,
+        slug, // Thêm slug vào data
         images,
         socialData
       });
@@ -70,7 +72,7 @@ export const useRankMathSEO = ({
     if (autoAnalyze && (title || content)) {
       debouncedAnalyze();
     }
-  }, [title, content, metaDescription, url, focusKeyword, images, socialData, autoAnalyze, debouncedAnalyze]);
+  }, [title, content, metaDescription, url, focusKeyword, slug, images, socialData, autoAnalyze, debouncedAnalyze]);
 
   // Manual analyze
   const analyze = useCallback(() => {

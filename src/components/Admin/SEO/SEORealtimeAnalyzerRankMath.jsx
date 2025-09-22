@@ -10,25 +10,32 @@ import {
   IconButton,
   Divider,
   Grid,
-  Stack
+  Stack,
+  Button
 } from '@mui/material';
 import {
   ExpandMore,
   ExpandLess,
   Search,
-  TrendingUp
+  TrendingUp,
+  Link as LinkIcon,
+  AutoAwesome
 } from '@mui/icons-material';
 import RankMathSEOScore from './RankMathSEOScore';
 import { useRankMathSEO } from '../../../hooks/useRankMathSEO';
+import { generateSlug, validateSlug, autoGenerateSlug } from '../../../utils/slugify';
 
 const SEORealtimeAnalyzer = ({ 
   title = '', 
   content = '',
   metaDescription = '',
+  slug = '',
   url = '',
   focusKeyword = '', 
   onFocusKeywordChange,
   onMetaDescriptionChange,
+  onSlugChange,
+  mode = 'add',
   images = [],
   socialData = {},
   expanded = true,
@@ -37,6 +44,11 @@ const SEORealtimeAnalyzer = ({
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [localFocusKeyword, setLocalFocusKeyword] = useState(focusKeyword);
   const [localMetaDescription, setLocalMetaDescription] = useState(metaDescription);
+  const [localSlug, setLocalSlug] = useState(slug);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+
+  // Calculate full URL from slug
+  const fullUrl = localSlug ? `https://yoursite.com/${localSlug}` : 'https://yoursite.com/';
 
   // Sử dụng Rank Math SEO hook
   const {
@@ -56,7 +68,7 @@ const SEORealtimeAnalyzer = ({
     title,
     content,
     metaDescription: localMetaDescription,
-    url,
+    url: fullUrl,
     focusKeyword: localFocusKeyword,
     images,
     socialData,
@@ -72,6 +84,23 @@ const SEORealtimeAnalyzer = ({
   useEffect(() => {
     setLocalMetaDescription(metaDescription);
   }, [metaDescription]);
+
+  useEffect(() => {
+    setLocalSlug(slug);
+  }, [slug]);
+
+  // Auto-generate slug from title if not manually edited
+  useEffect(() => {
+    if (title && !isSlugManuallyEdited) {
+      const autoSlug = autoGenerateSlug(title, localSlug, isSlugManuallyEdited);
+      if (autoSlug !== localSlug) {
+        setLocalSlug(autoSlug);
+        if (onSlugChange) {
+          onSlugChange(autoSlug);
+        }
+      }
+    }
+  }, [title, isSlugManuallyEdited]);
 
   // Handle focus keyword change
   const handleFocusKeywordChange = (event) => {
@@ -90,6 +119,31 @@ const SEORealtimeAnalyzer = ({
       onMetaDescriptionChange(newMetaDescription);
     }
   };
+
+  // Handle slug change
+  const handleSlugChange = (event) => {
+    const newSlug = event.target.value;
+    setLocalSlug(newSlug);
+    setIsSlugManuallyEdited(true);
+    if (onSlugChange) {
+      onSlugChange(newSlug);
+    }
+  };
+
+  // Generate slug from title
+  const handleGenerateSlug = () => {
+    if (title) {
+      const newSlug = generateSlug(title);
+      setLocalSlug(newSlug);
+      setIsSlugManuallyEdited(false);
+      if (onSlugChange) {
+        onSlugChange(newSlug);
+      }
+    }
+  };
+
+  // Validate slug
+  const slugValidation = validateSlug(localSlug);
 
   // Get category scores
   const categoryScores = {
@@ -169,6 +223,81 @@ const SEORealtimeAnalyzer = ({
              localMetaDescription.length > 160 ? '❌ Quá dài (>160 ký tự)' : '✅ Độ dài tốt')
           }
         />
+
+        {/* Permalink/Slug Input - Always show */}
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <TextField
+              fullWidth
+              label="Permalink (Slug)"
+              value={localSlug}
+              onChange={handleSlugChange}
+              placeholder="duong-dan-url-bai-viet"
+              InputProps={{
+                startAdornment: (
+                  <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
+                    <LinkIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                  </Box>
+                )
+              }}
+              sx={{ 
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: validateSlug(localSlug).isValid ? 'success.main' : 'error.main'
+                  }
+                }
+              }}
+              size="small"
+              error={!validateSlug(localSlug).isValid}
+              helperText={validateSlug(localSlug).message}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleGenerateSlug}
+              disabled={!title}
+              startIcon={<AutoAwesome />}
+              sx={{ minWidth: 120 }}
+            >
+              Tự động
+            </Button>
+          </Box>
+          
+          {/* Google Search Preview */}
+          {(title || localMetaDescription) && (
+            <Box sx={{ 
+              p: 2, 
+              border: '1px solid', 
+              borderColor: 'divider', 
+              borderRadius: 2, 
+              backgroundColor: 'grey.50',
+              fontFamily: 'Arial, sans-serif'
+            }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '12px', mb: 0.5 }}>
+                🔍 Preview Google Search
+              </Typography>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  color: '#1a0dab', 
+                  fontSize: '20px', 
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  lineHeight: 1.2,
+                  '&:hover': { textDecoration: 'none' }
+                }}
+              >
+                {title || 'Tiêu đề trang'}
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#006621', fontSize: '14px', mt: 0.5 }}>
+                {localSlug ? `https://yoursite.com/${localSlug}` : 'https://yoursite.com/'}
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#4d5156', fontSize: '14px', mt: 0.5, lineHeight: 1.4 }}>
+                {localMetaDescription || 'Meta description sẽ hiển thị ở đây...'}
+              </Typography>
+            </Box>
+          )}
+        </Box>
 
         {/* Main SEO Score Component */}
         <RankMathSEOScore

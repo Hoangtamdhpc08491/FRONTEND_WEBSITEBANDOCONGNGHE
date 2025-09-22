@@ -48,6 +48,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
   // Load initial data
   const [focusKeyword, setFocusKeyword] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
+  const [slug, setSlug] = useState("");
   const [schema, setSchema] = useState(null);
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
             newCategory: ""
           });
       
-      // Tự động load focus keyword và meta description từ database khi chỉnh sửa
+      // Tự động load focus keyword, meta description và slug từ database khi chỉnh sửa
       const existingFocusKeyword = 
         initialData.seoData?.focusKeyword || 
         initialData.focusKeyword || 
@@ -93,12 +94,16 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
         initialData.metaDescription || 
         initialData.seo?.metaDescription || 
         "";
+
+      const existingSlug = initialData.slug || "";
       
       setFocusKeyword(existingFocusKeyword);
       setMetaDescription(existingMetaDescription);
+      setSlug(existingSlug);
       console.log('🔑 Loaded SEO data from database:', { 
         focusKeyword: existingFocusKeyword,
-        metaDescription: existingMetaDescription 
+        metaDescription: existingMetaDescription,
+        slug: existingSlug
       });
         }
   
@@ -164,6 +169,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
       formData.append("isFeature", data.isFeature);
       formData.append('focusKeyword', focusKeyword);
       formData.append('metaDescription', metaDescription);
+      formData.append('slug', slug);
       formData.append('schema', JSON.stringify(schema));
       // Thumbnail: nếu là file mới thì append file, nếu là string thì append thumbnailUrl
       if (data.thumbnail instanceof File) {
@@ -271,11 +277,13 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
             title={title}
             content={content}
             metaDescription={metaDescription}
+            slug={slug}
             focusKeyword={focusKeyword}
             onFocusKeywordChange={setFocusKeyword}
             onMetaDescriptionChange={setMetaDescription}
+            onSlugChange={setSlug}
             mode={mode}
-            slug={initialData?.slug || ''}
+            url={slug ? `https://yoursite.com/${slug}` : ''}
           />
           
           {/* Schema Editor */}
