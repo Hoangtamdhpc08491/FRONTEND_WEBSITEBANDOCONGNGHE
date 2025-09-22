@@ -427,42 +427,49 @@ export class RankMathSEOEngine {
   }
 
   /**
-   * Test: Mật độ từ khóa
+   * Test: Mật độ từ khóa (cập nhật theo Rank Math thresholds)
    */
   testKeywordDensity(content, keyword) {
     const wordCount = this.countWords(content);
     const keywordCount = this.countKeywordOccurrences(content, keyword);
     const density = wordCount > 0 ? (keywordCount / wordCount) * 100 : 0;
     
-    if (density >= 0.5 && density <= 2.5) {
-      return {
-        status: 'ok',
-        message: `Mật độ từ khóa tối ưu (${density.toFixed(1)}%)`,
-        score: this.tests.keywordDensity.maxScore
-      };
-    } else if (density > 2.5 && density <= 4) {
-      return {
-        status: 'warning',
-        message: `Mật độ từ khóa hơi cao (${density.toFixed(1)}%)`,
-        score: Math.floor(this.tests.keywordDensity.maxScore * 0.7)
-      };
-    } else if (density < 0.5 && density > 0) {
-      return {
-        status: 'warning',
-        message: `Mật độ từ khóa thấp (${density.toFixed(1)}%)`,
-        score: Math.floor(this.tests.keywordDensity.maxScore * 0.5)
-      };
-    } else if (density > 4) {
+    // Rank Math thresholds:
+    // < 0.5%: Low (fail)
+    // > 2.5%: High (fail) 
+    // 0.5-0.75%: Fair (score 2)
+    // 0.76-1%: Good (score 3)
+    // > 1%: Best (score 6)
+    
+    if (density < 0.5) {
       return {
         status: 'fail',
-        message: `Mật độ từ khóa quá cao (${density.toFixed(1)}%). Có thể bị coi là spam`,
+        message: `Mật độ từ khóa thấp (${density.toFixed(2)}%). Nên từ 0.5-2.5%`,
         score: 0
+      };
+    } else if (density > 2.5) {
+      return {
+        status: 'fail',
+        message: `Mật độ từ khóa quá cao (${density.toFixed(2)}%). Có thể bị coi là spam`,
+        score: 0
+      };
+    } else if (density >= 0.5 && density <= 0.75) {
+      return {
+        status: 'warning',
+        message: `Mật độ từ khóa khá tốt (${density.toFixed(2)}%)`,
+        score: Math.floor(this.tests.keywordDensity.maxScore * 0.33) // 2/6
+      };
+    } else if (density > 0.75 && density <= 1.0) {
+      return {
+        status: 'warning',
+        message: `Mật độ từ khóa tốt (${density.toFixed(2)}%)`,
+        score: Math.floor(this.tests.keywordDensity.maxScore * 0.5) // 3/6
       };
     } else {
       return {
-        status: 'fail',
-        message: 'Không tìm thấy từ khóa trong nội dung',
-        score: 0
+        status: 'ok',
+        message: `Mật độ từ khóa tối ưu (${density.toFixed(2)}%)`,
+        score: this.tests.keywordDensity.maxScore // 6/6
       };
     }
   }
@@ -703,7 +710,7 @@ export class RankMathSEOEngine {
   }
 
   /**
-   * Tạo thống kê tổng quan
+   * Tạo thống kê tổng quan (cập nhật theo Rank Math)
    */
   generateStats(title, content, keyword) {
     return {
@@ -712,26 +719,51 @@ export class RankMathSEOEngine {
       wordCount: this.countWords(content),
       keywordCount: this.countKeywordOccurrences(content, keyword),
       keywordDensity: this.countWords(content) > 0 
-        ? ((this.countKeywordOccurrences(content, keyword) / this.countWords(content)) * 100).toFixed(1)
+        ? ((this.countKeywordOccurrences(content, keyword) / this.countWords(content)) * 100).toFixed(2)
         : 0
     };
   }
 
   /**
-   * Đếm số từ trong content
+   * Đếm số từ trong content (tương thích với Rank Math)
    */
   countWords(content) {
     if (!content) return 0;
-    return content.trim().split(/\s+/).filter(word => word.length > 0).length;
+    
+    // Xử lý content giống Rank Math:
+    // 1. Remove HTML tags
+    const textOnly = content.replace(/<[^>]*>/g, '');
+    
+    // 2. Convert to lowercase
+    const lowerText = textOnly.toLowerCase();
+    
+    // 3. Split by whitespace and filter out empty strings
+    const words = lowerText.trim().split(/\s+/).filter(word => word.length > 0);
+    
+    return words.length;
   }
 
   /**
-   * Đếm số lần xuất hiện của keyword
+   * Đếm số lần xuất hiện của keyword (tương thích với Rank Math)
    */
   countKeywordOccurrences(content, keyword) {
     if (!content || !keyword) return 0;
-    const regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-    const matches = content.match(regex);
+    
+    // Xử lý content giống Rank Math:
+    // 1. Remove HTML tags
+    const textOnly = content.replace(/<[^>]*>/g, '');
+    
+    // 2. Convert to lowercase  
+    const lowerText = textOnly.toLowerCase();
+    const lowerKeyword = keyword.toLowerCase();
+    
+    // 3. Escape special regex characters
+    const escapedKeyword = lowerKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // 4. Create regex với word boundaries để match exact words
+    const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
+    const matches = lowerText.match(regex);
+    
     return matches ? matches.length : 0;
   }
 }
