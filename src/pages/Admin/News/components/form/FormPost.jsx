@@ -47,6 +47,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
 
   // Load initial data
   const [focusKeyword, setFocusKeyword] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
   const [schema, setSchema] = useState(null);
 
   useEffect(() => {
@@ -80,15 +81,25 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
             newCategory: ""
           });
       
-      // Tự động load focus keyword từ database khi chỉnh sửa
+      // Tự động load focus keyword và meta description từ database khi chỉnh sửa
       const existingFocusKeyword = 
         initialData.seoData?.focusKeyword || 
         initialData.focusKeyword || 
         initialData.seo?.focusKeyword || 
         "";
       
+      const existingMetaDescription = 
+        initialData.seoData?.metaDescription || 
+        initialData.metaDescription || 
+        initialData.seo?.metaDescription || 
+        "";
+      
       setFocusKeyword(existingFocusKeyword);
-      console.log('🔑 Loaded focus keyword from database:', existingFocusKeyword);
+      setMetaDescription(existingMetaDescription);
+      console.log('🔑 Loaded SEO data from database:', { 
+        focusKeyword: existingFocusKeyword,
+        metaDescription: existingMetaDescription 
+      });
         }
   
       } catch (err) {
@@ -152,6 +163,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
       formData.append("publishAt", data.isScheduled ? data.publishAt : null);
       formData.append("isFeature", data.isFeature);
       formData.append('focusKeyword', focusKeyword);
+      formData.append('metaDescription', metaDescription);
       formData.append('schema', JSON.stringify(schema));
       // Thumbnail: nếu là file mới thì append file, nếu là string thì append thumbnailUrl
       if (data.thumbnail instanceof File) {
@@ -258,8 +270,10 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
           <SEORealtimeAnalyzerRankMath
             title={title}
             content={content}
+            metaDescription={metaDescription}
             focusKeyword={focusKeyword}
             onFocusKeywordChange={setFocusKeyword}
+            onMetaDescriptionChange={setMetaDescription}
             mode={mode}
             slug={initialData?.slug || ''}
           />

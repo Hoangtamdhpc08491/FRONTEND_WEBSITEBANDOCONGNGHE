@@ -28,6 +28,7 @@ const SEORealtimeAnalyzer = ({
   url = '',
   focusKeyword = '', 
   onFocusKeywordChange,
+  onMetaDescriptionChange,
   images = [],
   socialData = {},
   expanded = true,
@@ -83,7 +84,11 @@ const SEORealtimeAnalyzer = ({
 
   // Handle meta description change
   const handleMetaDescriptionChange = (event) => {
-    setLocalMetaDescription(event.target.value);
+    const newMetaDescription = event.target.value;
+    setLocalMetaDescription(newMetaDescription);
+    if (onMetaDescriptionChange) {
+      onMetaDescriptionChange(newMetaDescription);
+    }
   };
 
   // Get category scores
@@ -136,21 +141,34 @@ const SEORealtimeAnalyzer = ({
           helperText="Từ khóa chính sẽ được sử dụng để phân tích SEO"
         />
 
-        {/* Meta Description Input */}
-        {showAdvanced && (
-          <TextField
-            fullWidth
-            label="Meta Description"
-            value={localMetaDescription}
-            onChange={handleMetaDescriptionChange}
-            placeholder="Nhập mô tả meta cho trang"
-            multiline
-            rows={2}
-            sx={{ mb: 2 }}
-            size="small"
-            helperText={`${localMetaDescription.length}/160 ký tự. Nên từ 120-160 ký tự`}
-          />
-        )}
+        {/* Meta Description Input - Always show */}
+        <TextField
+          fullWidth
+          label="Meta Description"
+          value={localMetaDescription}
+          onChange={handleMetaDescriptionChange}
+          placeholder="Nhập mô tả meta cho trang (120-160 ký tự)"
+          multiline
+          rows={2}
+          sx={{ 
+            mb: 2,
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: localMetaDescription.length === 0 ? 'error.main' :
+                           localMetaDescription.length < 120 ? 'warning.main' :
+                           localMetaDescription.length > 160 ? 'warning.main' : 'success.main'
+              }
+            }
+          }}
+          size="small"
+          error={localMetaDescription.length > 160}
+          helperText={
+            `${localMetaDescription.length}/160 ký tự. ` +
+            (localMetaDescription.length === 0 ? '❌ Thiếu Meta Description' :
+             localMetaDescription.length < 120 ? '⚠️ Nên từ 120-160 ký tự' :
+             localMetaDescription.length > 160 ? '❌ Quá dài (>160 ký tự)' : '✅ Độ dài tốt')
+          }
+        />
 
         {/* Main SEO Score Component */}
         <RankMathSEOScore
@@ -255,7 +273,7 @@ const SEORealtimeAnalyzer = ({
           <Typography variant="h6" sx={{ mb: 1, color: 'primary.main' }}>
             Thống kê nội dung
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={6} sm={3}>
               <Typography variant="body2" color="text.secondary">
                 Số từ: <strong>{stats.wordCount || 0}</strong>
@@ -277,6 +295,42 @@ const SEORealtimeAnalyzer = ({
               </Typography>
             </Grid>
           </Grid>
+
+          {/* Google Search Preview */}
+          {(title || localMetaDescription) && (
+            <>
+              <Typography variant="h6" sx={{ mb: 1, color: 'primary.main' }}>
+                Preview Google Search
+              </Typography>
+              <Box sx={{ 
+                p: 2, 
+                border: '1px solid', 
+                borderColor: 'divider', 
+                borderRadius: 2, 
+                backgroundColor: 'grey.50',
+                fontFamily: 'Arial, sans-serif'
+              }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    color: '#1a0dab', 
+                    fontSize: '20px', 
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    '&:hover': { textDecoration: 'none' }
+                  }}
+                >
+                  {title || 'Tiêu đề trang'}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#006621', fontSize: '14px', mt: 0.5 }}>
+                  https://yoursite.com/bai-viet-slug
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#4d5156', fontSize: '14px', mt: 0.5, lineHeight: 1.4 }}>
+                  {localMetaDescription || 'Meta description sẽ hiển thị ở đây...'}
+                </Typography>
+              </Box>
+            </>
+          )}
         </Collapse>
       </CardContent>
     </Card>
