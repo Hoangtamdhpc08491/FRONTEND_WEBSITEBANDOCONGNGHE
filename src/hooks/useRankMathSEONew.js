@@ -68,12 +68,28 @@ export const useRankMathSEONew = ({
     const categoryData = analysis.categories[categoryKey];
     const categoryErrors = analysis.errors?.[categoryKey] || [];
     
+    // Tính toán passed tests cho category này
+    const passedTests = [];
+    if (analysis?.results && rankMathEngine.categories[categoryKey]) {
+      const categoryTests = rankMathEngine.categories[categoryKey].tests;
+      categoryTests.forEach(testName => {
+        const testResult = analysis.results[testName];
+        if (testResult && testResult.passed) {
+          passedTests.push({
+            test: testName,
+            message: rankMathEngine.getSuccessMessage(testName, testResult)
+          });
+        }
+      });
+    }
+    
     return {
       name: categoryData.name,
       totalTests: categoryData.totalTests,
       passedTests: categoryData.passed,
       failedTests: categoryData.errors,
       errors: categoryErrors,
+      passedTestsList: passedTests, // Danh sách chi tiết các test đã pass
       score: categoryData.totalTests > 0 ? Math.round((categoryData.passed / categoryData.totalTests) * 100) : 0
     };
   }, [analysis]);

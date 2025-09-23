@@ -517,6 +517,38 @@ export class RankMathSEOEngine {
     };
   }
 
+  /**
+   * Lấy message thành công cho test đã pass
+   */
+  getSuccessMessage(testName, testResult) {
+    const successMessages = {
+      focusKeywordInTitle: "Hurray! You're using Focus Keyword in the SEO Title.",
+      focusKeywordInMetaDescription: "Focus Keyword used inside SEO Meta Description.",
+      focusKeywordInURL: "Focus Keyword used in the URL.",
+      focusKeywordAtBeginning: "Focus Keyword appears in the first 10% of the content.",
+      focusKeywordInContent: "Focus Keyword found in the content.",
+      contentLength: `Content is ${this.countWords(testResult.content || '')} words long. Good job!`,
+      focusKeywordInSubheadings: "Focus Keyword found in the subheading(s).",
+      imageWithFocusKeyword: "Focus Keyword found in image alt attribute(s).",
+      keywordDensity: `Keyword Density is ${testResult.density || 'good'}, the Focus Keyword and combination appears multiple times.`,
+      urlLength: `URL is ${testResult.length || 'suitable'} characters long. Kudos!`,
+      externalLinks: "Great! You are linking to external resources.",
+      doFollowLinks: "At least one external link with DoFollow found in your content.",
+      internalLinks: "You are linking to other resources on your website which is great.",
+      focusKeywordSet: "You haven't used this Focus Keyword before.",
+      contentAI: "You are using Content AI to optimise this Post.",
+      focusKeywordNearBeginning: "Focus Keyword used at the beginning of SEO title.",
+      titleSentiment: "Your title has a positive or a negative sentiment.",
+      titlePowerWords: "Your title contains power word(s). Booyah!",
+      titleHasNumber: "You are using a number in your SEO title.",
+      tableOfContents: "You are using Table of Contents to break-down your text.",
+      shortParagraphs: "You are using short paragraphs.",
+      contentAssets: "Your content contains images and/or video(s)."
+    };
+
+    return successMessages[testName] || testResult?.message || "Test passed successfully.";
+  }
+
   countWords(content) {
     if (!content) return 0;
     const textOnly = content.replace(/<[^>]*>/g, '');

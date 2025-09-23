@@ -313,7 +313,7 @@ const RankMathSEOScoreNew = ({
                         {category.name}
                       </Typography>
                       <Chip 
-                        label={`${category.failedTests} errors`}
+                        label={hasErrors ? `${category.failedTests} errors` : 'All Good'}
                         size="small"
                         color={hasErrors ? "error" : "success"}
                         variant="outlined"
@@ -327,30 +327,65 @@ const RankMathSEOScoreNew = ({
                   </AccordionSummary>
                   
                   <AccordionDetails sx={{ pt: 0 }}>
-                    {category.errors && category.errors.length > 0 ? (
-                      <List dense>
-                        {category.errors.map((error, index) => (
-                          <ListItem key={index} sx={{ px: 0 }}>
-                            <ListItemIcon sx={{ minWidth: 32 }}>
-                              <CloseIcon color="error" fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText 
-                              primary={error.message}
-                              primaryTypographyProps={{ 
-                                variant: 'body2',
-                                color: 'text.primary'
-                              }}
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    ) : (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 1 }}>
-                        <CheckCircleIcon color="success" fontSize="small" />
-                        <Typography variant="body2" color="success.main">
-                          All tests in this category passed!
+                    {/* Hiển thị các tests đã pass với dấu tích xanh */}
+                    {category.passedTestsList && category.passedTestsList.length > 0 && (
+                      <Box sx={{ mb: category.errors?.length > 0 ? 2 : 0 }}>
+                        <Typography variant="subtitle3" sx={{ mb: 1, color: 'success.main', fontWeight: 'bold' }}>
+                          ✅ Completed ({category.passedTestsList.length})
                         </Typography>
+                        <List dense>
+                          {category.passedTestsList.map((test, index) => (
+                            <ListItem key={`passed-${index}`} sx={{ px: 0, py: 0.5 }}>
+                              <ListItemIcon sx={{ minWidth: 32 }}>
+                                <CheckCircleIcon color="success" fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText 
+                                primary={test.message}
+                                primaryTypographyProps={{ 
+                                  variant: 'body2',
+                                  color: 'success.main',
+                                  fontWeight: 500
+                                }}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
                       </Box>
+                    )}
+                    
+                    {/* Hiển thị errors nếu có */}
+                    {category.errors && category.errors.length > 0 ? (
+                      <Box>
+                        <Typography variant="subtitle3" sx={{ mb: 1, color: 'error.main', fontWeight: 'bold' }}>
+                          ❌ Needs Improvement ({category.errors.length})
+                        </Typography>
+                        <List dense>
+                          {category.errors.map((error, index) => (
+                            <ListItem key={`error-${index}`} sx={{ px: 0, py: 0.5 }}>
+                              <ListItemIcon sx={{ minWidth: 32 }}>
+                                <CloseIcon color="error" fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText 
+                                primary={error.message}
+                                primaryTypographyProps={{ 
+                                  variant: 'body2',
+                                  color: 'text.primary'
+                                }}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Box>
+                    ) : (
+                      // Hiển thị khi tất cả tests đều pass
+                      !category.passedTestsList?.length && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 1 }}>
+                          <CheckCircleIcon color="success" fontSize="small" />
+                          <Typography variant="body2" color="success.main">
+                            All tests in this category passed!
+                          </Typography>
+                        </Box>
+                      )
                     )}
                   </AccordionDetails>
                 </Accordion>
