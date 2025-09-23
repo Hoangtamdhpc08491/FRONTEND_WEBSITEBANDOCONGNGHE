@@ -67,7 +67,7 @@ export class RankMathSEOEngine {
       focusKeywordInSubheadings: 'Use Focus Keyword in subheading(s) like H2, H3, H4, etc..',
       imageWithFocusKeyword: 'Add an image with your Focus Keyword as alt text.',
       keywordDensity: 'Keyword Density is 0. Aim for around 1% Keyword Density.',
-      urlLength: 'URL is 28 characters long. Kudos!',
+      urlLength: 'URL should be under 75 characters long.',
       externalLinks: 'Link out to external resources.',
       doFollowLinks: 'Add DoFollow links pointing to external resources.',
       internalLinks: 'Add internal links in your content.',
@@ -326,7 +326,8 @@ export class RankMathSEOEngine {
     const passed = length <= 75;
     return { 
       passed, 
-      message: passed ? `URL is ${length} characters long. Kudos!` : `URL is too long (${length} characters)`
+      message: passed ? `URL is ${length} characters long. Kudos!` : `URL is too long (${length} characters)`,
+      length: length
     };
   }
 

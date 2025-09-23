@@ -9,6 +9,7 @@ import { newsCategoryService } from "@/services/admin/newCategoryService";
 import { normalizeCategoryList } from "@/utils";
 import { tagService } from "@/services/admin/tagService";
 import useAuthStore from "@/stores/AuthStore";
+import { FRONTEND_PUBLIC_URL } from "@/constants/environment";
 
 const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
   const { user } = useAuthStore();
@@ -283,7 +284,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
             onMetaDescriptionChange={setMetaDescription}
             onSlugChange={setSlug}
             mode={mode}
-            url={slug ? `https://yoursite.com/${slug}` : ''}
+            url={slug ? `${FRONTEND_PUBLIC_URL}/tin-tuc/${slug}` : `${FRONTEND_PUBLIC_URL}/tin-tuc/`}
           />
           
           {/* Schema Editor */}

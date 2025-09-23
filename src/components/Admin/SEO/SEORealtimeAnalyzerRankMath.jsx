@@ -15,8 +15,6 @@ import {
 } from '@mui/material';
 import {
   ExpandMore,
-  ExpandLess,
-  Search,
   TrendingUp,
   Link as LinkIcon,
   AutoAwesome
@@ -24,22 +22,20 @@ import {
 import RankMathSEOScore from './RankMathSEOScoreNew';
 import { useRankMathSEO } from '../../../hooks/useRankMathSEONew';
 import { generateSlug, validateSlug, autoGenerateSlug } from '../../../utils/slugify';
+import { FRONTEND_PUBLIC_URL } from '../../../constants/environment';
 
 const SEORealtimeAnalyzer = ({ 
   title = '', 
   content = '',
   metaDescription = '',
   slug = '',
-  url = '',
   focusKeyword = '', 
   onFocusKeywordChange,
   onMetaDescriptionChange,
   onSlugChange,
-  mode = 'add',
   images = [],
   socialData = {},
-  expanded = true,
-  showAdvanced = false
+  expanded = true
 }) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [localFocusKeyword, setLocalFocusKeyword] = useState(focusKeyword);
@@ -47,8 +43,8 @@ const SEORealtimeAnalyzer = ({
   const [localSlug, setLocalSlug] = useState(slug);
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
 
-  // Calculate full URL from slug
-  const fullUrl = localSlug ? `https://yoursite.com/${localSlug}` : 'https://yoursite.com/';
+  // Calculate full URL from slug using environment URL
+  const fullUrl = localSlug ? `${FRONTEND_PUBLIC_URL}/tin-tuc/${localSlug}` : `${FRONTEND_PUBLIC_URL}/tin-tuc/`;
 
   // Sử dụng Rank Math SEO hook mới
   const {
@@ -133,9 +129,6 @@ const SEORealtimeAnalyzer = ({
       }
     }
   };
-
-  // Validate slug
-  const slugValidation = validateSlug(localSlug);
 
   // Get category scores from new data structure
   const categoryScores = {
@@ -289,7 +282,7 @@ const SEORealtimeAnalyzer = ({
                 {title || 'Tiêu đề trang'}
               </Typography>
               <Typography variant="body2" sx={{ color: '#006621', fontSize: '14px', mt: 0.5 }}>
-                {localSlug ? `https://yoursite.com/${localSlug}` : 'https://yoursite.com/'}
+                {fullUrl}
               </Typography>
               <Typography variant="body2" sx={{ color: '#4d5156', fontSize: '14px', mt: 0.5, lineHeight: 1.4 }}>
                 {localMetaDescription || 'Meta description sẽ hiển thị ở đây...'}
@@ -303,7 +296,7 @@ const SEORealtimeAnalyzer = ({
           title={title}
           content={content}
           metaDescription={localMetaDescription}
-          url={url}
+          url={fullUrl}
           focusKeyword={localFocusKeyword}
           images={images}
           socialData={socialData}
@@ -423,42 +416,6 @@ const SEORealtimeAnalyzer = ({
               </Typography>
             </Grid>
           </Grid>
-
-          {/* Google Search Preview */}
-          {(title || localMetaDescription) && (
-            <>
-              <Typography variant="h6" sx={{ mb: 1, color: 'primary.main' }}>
-                Preview Google Search
-              </Typography>
-              <Box sx={{ 
-                p: 2, 
-                border: '1px solid', 
-                borderColor: 'divider', 
-                borderRadius: 2, 
-                backgroundColor: 'grey.50',
-                fontFamily: 'Arial, sans-serif'
-              }}>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
-                    color: '#1a0dab', 
-                    fontSize: '20px', 
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    '&:hover': { textDecoration: 'none' }
-                  }}
-                >
-                  {title || 'Tiêu đề trang'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#006621', fontSize: '14px', mt: 0.5 }}>
-                  https://yoursite.com/bai-viet-slug
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#4d5156', fontSize: '14px', mt: 0.5, lineHeight: 1.4 }}>
-                  {localMetaDescription || 'Meta description sẽ hiển thị ở đây...'}
-                </Typography>
-              </Box>
-            </>
-          )}
         </Collapse>
       </CardContent>
     </Card>
