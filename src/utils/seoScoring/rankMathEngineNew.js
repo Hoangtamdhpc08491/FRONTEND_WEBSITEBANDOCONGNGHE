@@ -170,7 +170,7 @@ export class RankMathSEOEngine {
       case 'focusKeywordInSubheadings':
         return this.testFocusKeywordInSubheadings(content, keyword);
       case 'imageWithFocusKeyword':
-        return this.testImageWithFocusKeyword(images, keyword);
+        return this.testImageWithFocusKeyword(content, images, keyword);
       case 'keywordDensity':
         return this.testKeywordDensity(content, keyword);
       case 'urlLength':
@@ -291,15 +291,35 @@ export class RankMathSEOEngine {
     };
   }
 
-  testImageWithFocusKeyword(images, keyword) {
+  testImageWithFocusKeyword(content, images, keyword) {
     if (!keyword) return { passed: false, message: 'No focus keyword set' };
-    if (!images || images.length === 0) {
-      return { passed: false, message: 'Add an image with your Focus Keyword as alt text.' };
+    
+    let foundInImages = false;
+    let foundInContent = false;
+    
+    // Check images array if provided
+    if (images && images.length > 0) {
+      foundInImages = images.some(img => 
+        img.alt && img.alt.toLowerCase().includes(keyword.toLowerCase())
+      );
     }
     
-    const passed = images.some(img => 
-      img.alt && img.alt.toLowerCase().includes(keyword.toLowerCase())
-    );
+    // Check images in HTML content
+    if (content) {
+      const imgRegex = /<img[^>]+alt\s*=\s*["']([^"']+)["'][^>]*>/gi;
+      let match;
+      const altTexts = [];
+      
+      while ((match = imgRegex.exec(content)) !== null) {
+        altTexts.push(match[1]);
+      }
+      
+      foundInContent = altTexts.some(alt => 
+        alt.toLowerCase().includes(keyword.toLowerCase())
+      );
+    }
+    
+    const passed = foundInImages || foundInContent;
     
     return { 
       passed, 
