@@ -3,6 +3,8 @@
  * Tái tạo logic chấm điểm SEO giống hệt Rank Math Demo
  */
 
+import { isInternalLink, FRONTEND_PUBLIC_URL } from '../../constants/environment';
+
 export class RankMathSEOEngine {
   constructor() {
     // Rank Math Categories - đếm errors giống demo thực tế
@@ -329,37 +331,81 @@ export class RankMathSEOEngine {
   }
 
   testExternalLinks(content) {
-    const externalLinkRegex = /<a[^>]*href=["|'](https?:\/\/[^"']*)["|'][^>]*>/gi;
-    const matches = content.match(externalLinkRegex) || [];
-    const passed = matches.length > 0;
+    // Tìm tất cả links trong content
+    const linkRegex = /<a[^>]*href=["|']([^"']*)["|'][^>]*>/gi;
+    const links = [];
+    let match;
+    
+    while ((match = linkRegex.exec(content)) !== null) {
+      links.push(match[1]);
+    }
+    
+    // Lọc ra chỉ external links (không phải internal links)
+    const externalLinks = links.filter(link => !isInternalLink(link) && (link.startsWith('http://') || link.startsWith('https://')));
+    
+    const passed = externalLinks.length > 0;
     return { 
       passed, 
-      message: passed ? `Found ${matches.length} external links` : 'Link out to external resources.'
+      message: passed 
+        ? `Found ${externalLinks.length} external links` 
+        : 'Link out to external resources.',
+      count: externalLinks.length,
+      externalLinks: externalLinks
     };
   }
 
   testDoFollowLinks(content) {
-    const externalLinkRegex = /<a[^>]*href=["|'](https?:\/\/[^"']*)["|'][^>]*>/gi;
-    const noFollowRegex = /<a[^>]*rel=["|'][^"']*nofollow[^"']*["|'][^>]*>/gi;
+    // Tìm tất cả links với attributes
+    const linkRegex = /<a[^>]*href=["|']([^"']*)["|'][^>]*>/gi;
+    const links = [];
+    let match;
     
-    const totalExternal = (content.match(externalLinkRegex) || []).length;
-    const noFollow = (content.match(noFollowRegex) || []).length;
-    const doFollow = totalExternal - noFollow;
+    while ((match = linkRegex.exec(content)) !== null) {
+      const href = match[1];
+      const fullTag = match[0];
+      
+      // Chỉ kiểm tra external links
+      if (!isInternalLink(href) && (href.startsWith('http://') || href.startsWith('https://'))) {
+        const hasNoFollow = /rel=["|'][^"']*nofollow[^"']*["|']/i.test(fullTag);
+        if (!hasNoFollow) {
+          links.push(href);
+        }
+      }
+    }
     
-    const passed = doFollow > 0;
+    const passed = links.length > 0;
     return { 
       passed, 
-      message: passed ? `Found ${doFollow} DoFollow links` : 'Add DoFollow links pointing to external resources.'
+      message: passed 
+        ? `Found ${links.length} external DoFollow links` 
+        : 'Add DoFollow links pointing to external resources.',
+      count: links.length,
+      doFollowLinks: links
     };
   }
 
   testInternalLinks(content) {
-    const internalLinkRegex = /<a[^>]*href=["|'](?!http|#|mailto:|tel:)([^"']*)["|'][^>]*>/gi;
-    const matches = content.match(internalLinkRegex) || [];
-    const passed = matches.length > 0;
+    // Tìm tất cả links trong content
+    const linkRegex = /<a[^>]*href=["|']([^"']*)["|'][^>]*>/gi;
+    const links = [];
+    let match;
+    
+    while ((match = linkRegex.exec(content)) !== null) {
+      links.push(match[1]);
+    }
+    
+    // Lọc ra internal links sử dụng helper từ environment
+    const internalLinks = links.filter(link => isInternalLink(link));
+    
+    const passed = internalLinks.length > 0;
+    
     return { 
       passed, 
-      message: passed ? `Found ${matches.length} internal links` : 'Add internal links in your content.'
+      message: passed 
+        ? `Found ${internalLinks.length} internal links pointing to ${FRONTEND_PUBLIC_URL}` 
+        : `Add internal links in your content pointing to your website (${FRONTEND_PUBLIC_URL}).`,
+      count: internalLinks.length,
+      internalLinks: internalLinks
     };
   }
 
@@ -532,9 +578,9 @@ export class RankMathSEOEngine {
       imageWithFocusKeyword: "Focus Keyword found in image alt attribute(s).",
       keywordDensity: `Keyword Density is ${testResult.density || 'good'}, the Focus Keyword and combination appears multiple times.`,
       urlLength: `URL is ${testResult.length || 'suitable'} characters long. Kudos!`,
-      externalLinks: "Great! You are linking to external resources.",
-      doFollowLinks: "At least one external link with DoFollow found in your content.",
-      internalLinks: "You are linking to other resources on your website which is great.",
+      externalLinks: `Great! You are linking to ${testResult.count || ''} external resources.`,
+      doFollowLinks: `At least ${testResult.count || 'one'} external link with DoFollow found in your content.`,
+      internalLinks: `You are linking to ${testResult.count || 'other'} internal resources on your website which is great.`,
       focusKeywordSet: "You haven't used this Focus Keyword before.",
       contentAI: "You are using Content AI to optimise this Post.",
       focusKeywordNearBeginning: "Focus Keyword used at the beginning of SEO title.",
