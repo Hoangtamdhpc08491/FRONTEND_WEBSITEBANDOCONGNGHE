@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -12,7 +12,6 @@ import {
   ListItemText,
   Collapse,
   IconButton,
-  Tooltip,
   Alert,
   LinearProgress,
   Stack,
@@ -26,44 +25,38 @@ import {
   CheckCircle,
   Warning,
   Error,
-  Info,
   ExpandMore,
-  ExpandLess,
-  TrendingUp,
   Search,
-  Lightbulb,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
-  Close as CloseIcon,
-  Speed,
-  Star
+  Close as CloseIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { rankMathEngine } from '../../../utils/seoScoring/rankMathEngineNew';
+import { useRankMathSEO } from '../../../hooks/useRankMathSEONew';
 
 // Styled components giống Rank Math
 const SEOScoreCircle = styled(Box)(({ theme, rating }) => {
   const getColors = () => {
     switch (rating) {
-      case 'great':
+      case 'excellent':
         return {
-          background: 'linear-gradient(135deg, #99d484 0%, #83c97f 100%)',
-          shadow: '1px 1px 1px #5ba857'
+          primary: '#4CAF50',
+          secondary: '#E8F5E8'
         };
       case 'good':
         return {
-          background: 'linear-gradient(135deg, #fdd07a 0%, #fcbe6c 100%)',
-          shadow: '1px 1px 1px #efb463'
+          primary: '#2196F3',
+          secondary: '#E3F2FD'
         };
-      case 'bad':
+      case 'ok':
         return {
-          background: 'linear-gradient(135deg, #f8b0a2 0%, #f1938c 100%)',
-          shadow: '1px 1px 1px #e48982'
+          primary: '#FF9800',
+          secondary: '#FFF3E0'
         };
       default:
         return {
-          background: 'linear-gradient(135deg, #b9b9b9 0%, #989898 100%)',
-          shadow: '1px 1px 1px #bbb'
+          primary: '#f44336',
+          secondary: '#FFEBEE'
         };
     }
   };
@@ -71,126 +64,40 @@ const SEOScoreCircle = styled(Box)(({ theme, rating }) => {
   const colors = getColors();
 
   return {
-    position: 'relative',
-    display: 'inline-block',
-    height: 96,
-    width: 96,
-    textAlign: 'center',
-    color: '#fff',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 80,
+    height: 80,
     borderRadius: '50%',
-    background: colors.background,
-    boxShadow: colors.shadow,
+    backgroundColor: colors.secondary,
+    border: `3px solid ${colors.primary}`,
     marginRight: theme.spacing(2),
     
     '& .score': {
-      fontSize: 42,
+      fontSize: '1.2rem',
       fontWeight: 'bold',
-      lineHeight: '42px',
-      display: 'block',
-      marginTop: '22px'
-    },
-    
-    '& .outof': {
-      fontSize: 12,
-      fontWeight: 'normal',
-      lineHeight: '12px',
-      display: 'block',
-      color: 'rgba(255,255,255,0.7)'
+      color: colors.primary,
+      lineHeight: 1,
+      
+      '& .outof': {
+        fontSize: '0.7rem',
+        color: theme.palette.text.secondary
+      }
     },
     
     '& .label': {
-      fontSize: 12,
-      position: 'absolute',
-      top: 100,
-      left: 0,
-      display: 'block',
-      width: '100%',
-      color: '#979ea5',
-      fontWeight: 500
+      fontSize: '0.6rem',
+      color: theme.palette.text.secondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginTop: 2
     }
   };
 });
 
-const StatusIcon = ({ status }) => {
-  const getIcon = () => {
-    switch (status) {
-      case 'ok':
-        return <CheckCircle sx={{ color: '#4CAF50' }} />;
-      case 'warning':
-        return <Warning sx={{ color: '#FF9800' }} />;
-      case 'fail':
-        return <Error sx={{ color: '#f44336' }} />;
-      default:
-        return <Info sx={{ color: '#2196F3' }} />;
-    }
-  };
-  
-  return getIcon();
-};
-
-const TestResultItem = ({ testName, result, expanded, onToggle }) => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'ok': return '#4CAF50';
-      case 'warning': return '#FF9800';
-      case 'fail': return '#f44336';
-      default: return '#2196F3';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'ok': return 'Đạt';
-      case 'warning': return 'Cảnh báo';
-      case 'fail': return 'Không đạt';
-      default: return 'Thông tin';
-    }
-  };
-
-  return (
-    <ListItem
-      sx={{
-        border: `1px solid ${getStatusColor(result.status)}20`,
-        borderRadius: 1,
-        mb: 1,
-        backgroundColor: `${getStatusColor(result.status)}05`,
-        '&:hover': {
-          backgroundColor: `${getStatusColor(result.status)}10`
-        }
-      }}
-    >
-      <ListItemIcon>
-        <StatusIcon status={result.status} />
-      </ListItemIcon>
-      <ListItemText
-        primary={
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-              {result.message}
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Chip
-                label={getStatusText(result.status)}
-                size="small"
-                sx={{
-                  backgroundColor: getStatusColor(result.status),
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: '0.75rem'
-                }}
-              />
-              <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: 45 }}>
-                {result.score}/{rankMathEngine.tests[testName]?.maxScore || 0} điểm
-              </Typography>
-            </Box>
-          </Box>
-        }
-      />
-    </ListItem>
-  );
-};
-
-const RankMathSEOScore = ({ 
+const RankMathSEOScoreNew = ({ 
   title = '', 
   content = '', 
   metaDescription = '',
@@ -198,61 +105,40 @@ const RankMathSEOScore = ({
   focusKeyword = '', 
   images = [],
   socialData = {},
-  onScoreChange,
+  autoAnalyze = true,
   showDetails = true,
-  autoAnalyze = true 
+  onScoreChange
 }) => {
-  const [analysis, setAnalysis] = useState(null);
   const [expanded, setExpanded] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // Memoized analysis để tránh tính toán lại không cần thiết
-  const seoAnalysis = useMemo(() => {
-    if (!autoAnalyze) return null;
-    
-    setLoading(true);
-    const result = rankMathEngine.analyzeSEO({
-      title,
-      content,
-      metaDescription,
-      url,
-      focusKeyword,
-      images,
-      socialData
-    });
-    setLoading(false);
-    return result;
-  }, [title, content, metaDescription, url, focusKeyword, images, socialData, autoAnalyze]);
+  // Use new hook
+  const {
+    analysis,
+    stats,
+    categoriesSummary,
+    suggestions,
+    isAnalyzing,
+    manualAnalyze,
+    getRatingInfo
+  } = useRankMathSEO({
+    title,
+    content,
+    metaDescription,
+    url,
+    focusKeyword,
+    images,
+    socialData,
+    autoAnalyze
+  });
 
+  // Update parent when score changes
   useEffect(() => {
-    if (seoAnalysis) {
-      setAnalysis(seoAnalysis);
-      if (onScoreChange) {
-        onScoreChange(seoAnalysis.score, seoAnalysis.rating);
-      }
+    if (analysis && onScoreChange) {
+      onScoreChange(analysis.score, analysis.rating);
     }
-  }, [seoAnalysis, onScoreChange]);
+  }, [analysis, onScoreChange]);
 
-  const manualAnalyze = () => {
-    setLoading(true);
-    const result = rankMathEngine.analyzeSEO({
-      title,
-      content,
-      metaDescription,
-      url,
-      focusKeyword,
-      images,
-      socialData
-    });
-    setAnalysis(result);
-    setLoading(false);
-    
-    if (onScoreChange) {
-      onScoreChange(result.score, result.rating);
-    }
-  };
-
-  if (loading) {
+  if (isAnalyzing) {
     return (
       <Card sx={{ mb: 2 }}>
         <CardContent sx={{ textAlign: 'center', py: 3 }}>
@@ -289,7 +175,8 @@ const RankMathSEOScore = ({
     );
   }
 
-  const { score, rating, results, errors, categories, stats = {} } = analysis;
+  const { score, rating } = analysis;
+  const ratingInfo = getRatingInfo(rating);
 
   return (
     <Card sx={{ 
@@ -311,24 +198,29 @@ const RankMathSEOScore = ({
           
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" sx={{ mb: 1, color: 'primary.main', fontWeight: 'bold' }}>
-              Phân tích SEO Realtime
+              Phân tích SEO Rank Math
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Điểm SEO: {score}/100 - {rating === 'great' ? 'Xuất sắc' : rating === 'good' ? 'Tốt' : rating === 'bad' ? 'Cần cải thiện' : 'Chưa đánh giá'}
+              Điểm SEO: {score}/100 - {ratingInfo.label}
             </Typography>
             
             {/* Stats nhanh */}
-            <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
-              <Typography variant="caption" color="text.secondary">
-                📝 {stats.wordCount || 0} từ
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                🎯 Mật độ keyword: {stats.keywordDensity || 0}%
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                🔤 Tiêu đề: {stats.titleLength || 0} ký tự
-              </Typography>
-            </Stack>
+            {stats && (
+              <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  📝 {stats.wordCount} từ
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  🎯 Mật độ keyword: {stats.keywordDensity}%
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  🔤 Tiêu đề: {stats.titleLength} ký tự
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  ❌ Lỗi: {stats.totalErrors}
+                </Typography>
+              </Stack>
+            )}
 
             {/* Progress bar */}
             <LinearProgress 
@@ -338,9 +230,9 @@ const RankMathSEOScore = ({
                 height: 6, 
                 borderRadius: 3,
                 '& .MuiLinearProgress-bar': {
-                  backgroundColor: rating === 'great' ? '#4CAF50' : 
-                                 rating === 'good' ? '#FF9800' : 
-                                 rating === 'bad' ? '#f44336' : '#9E9E9E'
+                  backgroundColor: rating === 'excellent' ? '#4CAF50' : 
+                                 rating === 'good' ? '#2196F3' : 
+                                 rating === 'ok' ? '#FF9800' : '#f44336'
                 }
               }} 
             />
@@ -359,37 +251,43 @@ const RankMathSEOScore = ({
           )}
         </Box>
 
-        {/* Suggestions theo category giống Rank Math */}
-        {categories && Object.keys(categories).length > 0 && (
+        {/* Categories summary */}
+        {categoriesSummary && categoriesSummary.length > 0 && (
           <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-              Tổng quan theo danh mục:
+              Tổng quan theo danh mục Rank Math:
             </Typography>
             <Grid container spacing={1}>
-              {Object.entries(categories).map(([categoryKey, categoryData]) => (
-                <Grid item xs={12} sm={6} key={categoryKey}>
-                  <Typography variant="body2">
-                    <strong>{categoryData.name}:</strong> {categoryData.errors} lỗi / {categoryData.totalTests} tests
-                  </Typography>
+              {categoriesSummary.map(category => (
+                <Grid item xs={12} sm={6} key={category.key}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {category.failedTests > 0 ? (
+                      <ErrorIcon color="error" fontSize="small" />
+                    ) : (
+                      <CheckCircleIcon color="success" fontSize="small" />
+                    )}
+                    <Typography variant="body2">
+                      <strong>{category.name}:</strong> {category.failedTests} errors / {category.totalTests} tests
+                    </Typography>
+                  </Box>
                 </Grid>
               ))}
             </Grid>
           </Alert>
         )}
 
-        {/* Chi tiết theo category Rank Math */}
+        {/* Chi tiết theo category */}
         {showDetails && (
           <Collapse in={expanded}>
             <Divider sx={{ my: 2 }} />
             
             {/* Render categories với errors */}
-            {categories && Object.entries(categories).map(([categoryKey, categoryData]) => {
-              const categoryErrors = errors?.[categoryKey] || [];
-              const hasErrors = categoryErrors.length > 0;
+            {categoriesSummary.map(category => {
+              const hasErrors = category.failedTests > 0;
               
               return (
                 <Accordion 
-                  key={categoryKey}
+                  key={category.key}
                   defaultExpanded={hasErrors}
                   sx={{ 
                     mb: 2,
@@ -412,10 +310,10 @@ const RankMathSEOScore = ({
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
                       {hasErrors ? <ErrorIcon /> : <CheckCircleIcon />}
                       <Typography variant="subtitle2" sx={{ flex: 1 }}>
-                        {categoryData.name}
+                        {category.name}
                       </Typography>
                       <Chip 
-                        label={`${categoryErrors.length} errors`}
+                        label={`${category.failedTests} errors`}
                         size="small"
                         color={hasErrors ? "error" : "success"}
                         variant="outlined"
@@ -429,9 +327,9 @@ const RankMathSEOScore = ({
                   </AccordionSummary>
                   
                   <AccordionDetails sx={{ pt: 0 }}>
-                    {categoryErrors.length > 0 ? (
+                    {category.errors && category.errors.length > 0 ? (
                       <List dense>
-                        {categoryErrors.map((error, index) => (
+                        {category.errors.map((error, index) => (
                           <ListItem key={index} sx={{ px: 0 }}>
                             <ListItemIcon sx={{ minWidth: 32 }}>
                               <CloseIcon color="error" fontSize="small" />
@@ -472,4 +370,4 @@ const RankMathSEOScore = ({
   );
 };
 
-export default RankMathSEOScore;
+export default RankMathSEOScoreNew;

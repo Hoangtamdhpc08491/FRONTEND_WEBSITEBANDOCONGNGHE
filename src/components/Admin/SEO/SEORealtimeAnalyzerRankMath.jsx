@@ -21,8 +21,8 @@ import {
   Link as LinkIcon,
   AutoAwesome
 } from '@mui/icons-material';
-import RankMathSEOScore from './RankMathSEOScore';
-import { useRankMathSEO } from '../../../hooks/useRankMathSEO';
+import RankMathSEOScore from './RankMathSEOScoreNew';
+import { useRankMathSEO } from '../../../hooks/useRankMathSEONew';
 import { generateSlug, validateSlug, autoGenerateSlug } from '../../../utils/slugify';
 
 const SEORealtimeAnalyzer = ({ 
@@ -50,20 +50,13 @@ const SEORealtimeAnalyzer = ({
   // Calculate full URL from slug
   const fullUrl = localSlug ? `https://yoursite.com/${localSlug}` : 'https://yoursite.com/';
 
-  // Sử dụng Rank Math SEO hook
+  // Sử dụng Rank Math SEO hook mới
   const {
     analysis,
-    loading,
-    error,
-    score,
-    rating,
-    suggestions,
     stats,
-    getCategoryScore,
-    getImprovementSuggestions,
-    passesBasicSEO,
-    passesGoodSEO,
-    passesExcellentSEO
+    suggestions,
+    categoriesSummary,
+    isAnalyzing
   } = useRankMathSEO({
     title,
     content,
@@ -72,8 +65,7 @@ const SEORealtimeAnalyzer = ({
     focusKeyword: localFocusKeyword,
     images,
     socialData,
-    autoAnalyze: true,
-    debounceMs: 800
+    autoAnalyze: true
   });
 
   // Update local state when props change
@@ -145,15 +137,22 @@ const SEORealtimeAnalyzer = ({
   // Validate slug
   const slugValidation = validateSlug(localSlug);
 
-  // Get category scores
+  // Get category scores from new data structure
   const categoryScores = {
-    basic: getCategoryScore('basic'),
-    content: getCategoryScore('content'),
-    technical: getCategoryScore('technical'),
-    social: getCategoryScore('social')
+    basic: categoriesSummary?.find(c => c.key === 'basicSEO')?.score || 0,
+    content: categoriesSummary?.find(c => c.key === 'contentReadability')?.score || 0,
+    technical: categoriesSummary?.find(c => c.key === 'additional')?.score || 0,
+    title: categoriesSummary?.find(c => c.key === 'titleReadability')?.score || 0
   };
 
-  const improvementSuggestions = getImprovementSuggestions();
+  // Get suggestions from new hook
+  const improvementSuggestions = suggestions || [];
+
+  // Calculate passes status from score
+  const currentScore = analysis?.score || 0;
+  const passesExcellentSEO = currentScore >= 90;
+  const passesGoodSEO = currentScore >= 70;
+  const passesBasicSEO = currentScore >= 50;
 
   return (
     <Card sx={{ 
@@ -326,7 +325,7 @@ const SEORealtimeAnalyzer = ({
                 <Typography variant="h4" sx={{ color: categoryScores.basic >= 70 ? 'success.main' : categoryScores.basic >= 50 ? 'warning.main' : 'error.main' }}>
                   {categoryScores.basic}%
                 </Typography>
-                <Typography variant="caption">Cơ bản</Typography>
+                <Typography variant="caption">Basic SEO</Typography>
               </Box>
             </Grid>
             <Grid item xs={6} sm={3}>
@@ -334,7 +333,7 @@ const SEORealtimeAnalyzer = ({
                 <Typography variant="h4" sx={{ color: categoryScores.content >= 70 ? 'success.main' : categoryScores.content >= 50 ? 'warning.main' : 'error.main' }}>
                   {categoryScores.content}%
                 </Typography>
-                <Typography variant="caption">Nội dung</Typography>
+                <Typography variant="caption">Content Readability</Typography>
               </Box>
             </Grid>
             <Grid item xs={6} sm={3}>
@@ -342,15 +341,15 @@ const SEORealtimeAnalyzer = ({
                 <Typography variant="h4" sx={{ color: categoryScores.technical >= 70 ? 'success.main' : categoryScores.technical >= 50 ? 'warning.main' : 'error.main' }}>
                   {categoryScores.technical}%
                 </Typography>
-                <Typography variant="caption">Kỹ thuật</Typography>
+                <Typography variant="caption">Additional</Typography>
               </Box>
             </Grid>
             <Grid item xs={6} sm={3}>
               <Box sx={{ textAlign: 'center', p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-                <Typography variant="h4" sx={{ color: categoryScores.social >= 70 ? 'success.main' : categoryScores.social >= 50 ? 'warning.main' : 'error.main' }}>
-                  {categoryScores.social}%
+                <Typography variant="h4" sx={{ color: categoryScores.title >= 70 ? 'success.main' : categoryScores.title >= 50 ? 'warning.main' : 'error.main' }}>
+                  {categoryScores.title}%
                 </Typography>
-                <Typography variant="caption">Mạng XH</Typography>
+                <Typography variant="caption">Title Readability</Typography>
               </Box>
             </Grid>
           </Grid>
@@ -405,22 +404,22 @@ const SEORealtimeAnalyzer = ({
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={6} sm={3}>
               <Typography variant="body2" color="text.secondary">
-                Số từ: <strong>{stats.wordCount || 0}</strong>
+                Số từ: <strong>{stats?.wordCount || 0}</strong>
               </Typography>
             </Grid>
             <Grid item xs={6} sm={3}>
               <Typography variant="body2" color="text.secondary">
-                Độ dài tiêu đề: <strong>{stats.titleLength || 0}</strong>
+                Độ dài tiêu đề: <strong>{stats?.titleLength || 0}</strong>
               </Typography>
             </Grid>
             <Grid item xs={6} sm={3}>
               <Typography variant="body2" color="text.secondary">
-                Mật độ keyword: <strong>{stats.keywordDensity || 0}%</strong>
+                Mật độ keyword: <strong>{stats?.keywordDensity || 0}%</strong>
               </Typography>
             </Grid>
             <Grid item xs={6} sm={3}>
               <Typography variant="body2" color="text.secondary">
-                Lần xuất hiện: <strong>{stats.keywordCount || 0}</strong>
+                Lần xuất hiện: <strong>{stats?.keywordCount || 0}</strong>
               </Typography>
             </Grid>
           </Grid>

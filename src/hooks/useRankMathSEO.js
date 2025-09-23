@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { rankMathEngine } from '../utils/seoScoring/rankMathEngine';
+import { rankMathEngine } from '../utils/seoScoring/rankMathEngineNew';
 
 /**
  * Hook để sử dụng Rank Math SEO Engine
