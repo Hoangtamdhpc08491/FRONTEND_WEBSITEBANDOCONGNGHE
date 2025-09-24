@@ -799,25 +799,38 @@ testShortParagraphs(content, maxScore = 3) {
   countWords(content) {
     if (!content) return 0;
     const textOnly = content.replace(/<[^>]*>/g, '');
-    const normalizedText = textOnly
-      .replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    const words = normalizedText.toLowerCase().split(/\s+/).filter(word => word.length > 0);
+      // 2. Convert to lowercase
+    const lowerText = textOnly.toLowerCase();
+    
+    // 3. Split by whitespace and filter out empty strings
+    const words = lowerText.trim().split(/\s+/).filter(word => word.length > 0);
     return words.length;
   }
 
-  countKeywordOccurrences(content, keyword) {
-    if (!content || !keyword) return 0;
-    const textOnly = content.replace(/<[^>]*>/g, '');
-    const normalizedText = textOnly.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF]/g, ' ');
-    const lowerText = normalizedText.toLowerCase();
-    const lowerKeyword = keyword.toLowerCase();
-    const escapedKeyword = lowerKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
-    const matches = lowerText.match(regex);
-    return matches ? matches.length : 0;
-  }
+  countKeywordOccurrences(content, keywordOrKeywords) {
+  if (!content || !keywordOrKeywords) return 0;
+
+  // 1) Lấy text thuần (giữ nguyên chữ, loại bỏ thẻ)
+  const text = content.replace(/<[^>]*>/g, ' ');
+
+  // 2) Hỗ trợ nhiều keyword: "a, b|c" → ["a","b","c"]
+  const keywords = Array.isArray(keywordOrKeywords)
+    ? keywordOrKeywords
+    : String(keywordOrKeywords)
+        .split(/[,|]/)               // cho phép phân tách bằng , hoặc |
+        .map(s => s.trim())
+        .filter(Boolean);
+
+  if (!keywords.length) return 0;
+
+  // 3) Tạo regex giống Rank Math: KHÔNG dùng \b, chỉ escape ký tự đặc biệt
+  const escaped = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const re = new RegExp(escaped.join('|'), 'gi');
+
+  // 4) Đếm match
+  const matches = text.match(re);
+  return matches ? matches.length : 0;
+}
 }
 
 // Export default instance
