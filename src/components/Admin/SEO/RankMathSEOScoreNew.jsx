@@ -283,7 +283,7 @@ const RankMathSEOScoreNew = ({
             
             {/* Render categories với errors */}
             {categoriesSummary.map(category => {
-              const hasErrors = category.failedTests > 0;
+              const hasErrors = category.failedCount > 0;
               
               return (
                 <Accordion 
@@ -313,7 +313,7 @@ const RankMathSEOScoreNew = ({
                         {category.name}
                       </Typography>
                       <Chip 
-                        label={hasErrors ? `${category.failedTests} errors` : 'All Good'}
+                        label={hasErrors ? `${category.failedCount} errors` : 'All Good'}
                         size="small"
                         color={hasErrors ? "error" : "success"}
                         variant="outlined"
@@ -340,12 +340,22 @@ const RankMathSEOScoreNew = ({
                                 <CheckCircleIcon color="success" fontSize="small" />
                               </ListItemIcon>
                               <ListItemText 
-                                primary={test.message}
-                                primaryTypographyProps={{ 
-                                  variant: 'body2',
-                                  color: 'success.main',
-                                  fontWeight: 500
-                                }}
+                                primary={
+                                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography variant="body2" color="success.main" fontWeight={500}>
+                                      {test.message}
+                                    </Typography>
+                                    {test.scoreText && (
+                                      <Chip 
+                                        label={test.scoreText} 
+                                        size="small" 
+                                        color="success" 
+                                        variant="outlined"
+                                        sx={{ fontSize: '11px', height: '20px' }}
+                                      />
+                                    )}
+                                  </Box>
+                                }
                               />
                             </ListItem>
                           ))}
@@ -354,31 +364,42 @@ const RankMathSEOScoreNew = ({
                     )}
                     
                     {/* Hiển thị errors nếu có */}
-                    {category.errors && category.errors.length > 0 ? (
+                    {category.failedTestsList && category.failedTestsList.length > 0 ? (
                       <Box>
                         <Typography variant="subtitle3" sx={{ mb: 1, color: 'error.main', fontWeight: 'bold' }}>
-                          ❌ Needs Improvement ({category.errors.length})
+                          ❌ Needs Improvement ({category.failedTestsList.length})
                         </Typography>
                         <List dense>
-                          {category.errors.map((error, index) => (
+                          {category.failedTestsList.map((error, index) => (
                             <ListItem key={`error-${index}`} sx={{ px: 0, py: 0.5 }}>
                               <ListItemIcon sx={{ minWidth: 32 }}>
                                 <CloseIcon color="error" fontSize="small" />
                               </ListItemIcon>
                               <ListItemText 
-                                primary={error.message}
-                                primaryTypographyProps={{ 
-                                  variant: 'body2',
-                                  color: 'text.primary'
-                                }}
+                                primary={
+                                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography variant="body2" color="text.primary">
+                                      {error.message}
+                                    </Typography>
+                                    {(error.scoreText || (error.score !== undefined && error.maxScore !== undefined)) && (
+                                      <Chip 
+                                        label={error.scoreText || `${error.score || 0}/${error.maxScore}`} 
+                                        size="small" 
+                                        color="error" 
+                                        variant="outlined"
+                                        sx={{ fontSize: '11px', height: '20px' }}
+                                      />
+                                    )}
+                                  </Box>
+                                }
                               />
                             </ListItem>
                           ))}
                         </List>
                       </Box>
                     ) : (
-                      // Hiển thị khi tất cả tests đều pass
-                      !category.passedTestsList?.length && (
+                      // Hiển thị khi không có failed tests và có passed tests
+                      category.passedTestsList?.length > 0 && (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 1 }}>
                           <CheckCircleIcon color="success" fontSize="small" />
                           <Typography variant="body2" color="success.main">

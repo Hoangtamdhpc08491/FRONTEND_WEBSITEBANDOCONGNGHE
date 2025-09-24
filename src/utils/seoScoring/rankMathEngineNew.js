@@ -7,48 +7,52 @@ import { isInternalLink, FRONTEND_PUBLIC_URL } from '../../constants/environment
 
 export class RankMathSEOEngine {
   constructor() {
-    // Rank Math Categories - đếm errors giống demo thực tế
+    // Rank Math Categories - điểm số theo demo thực tế
     this.categories = {
       basicSEO: {
         name: 'Basic SEO',
+        maxScore: 50,
         tests: [
-          'focusKeywordInTitle',
-          'focusKeywordInMetaDescription', 
-          'focusKeywordInURL',
-          'focusKeywordAtBeginning',
-          'focusKeywordInContent',
-          'contentLength'
+          { name: 'focusKeywordInTitle', maxScore: 34 },
+          { name: 'focusKeywordInMetaDescription', maxScore: 2 }, 
+          { name: 'focusKeywordInURL', maxScore: 1 },
+          { name: 'focusKeywordAtBeginning', maxScore: 3 },
+          { name: 'focusKeywordInContent', maxScore: 3 },
+          { name: 'contentLength', maxScore: 7 }
         ]
       },
       additional: {
         name: 'Additional',
+        maxScore: 29,
         tests: [
-          'focusKeywordInSubheadings',
-          'imageWithFocusKeyword',
-          'keywordDensity',
-          'urlLength',
-          'externalLinks',
-          'doFollowLinks',
-          'internalLinks',
-          'focusKeywordSet',
-          'contentAI'
+          { name: 'focusKeywordInSubheadings', maxScore: 2 },
+          { name: 'imageWithFocusKeyword', maxScore: 1 },
+          { name: 'keywordDensity', maxScore: 6 },
+          { name: 'urlLength', maxScore: 4 },
+          { name: 'externalLinks', maxScore: 4 },
+          { name: 'doFollowLinks', maxScore: 2 },
+          { name: 'internalLinks', maxScore: 4 },
+          { name: 'focusKeywordSet', maxScore: 1 },
+          { name: 'contentAI', maxScore: 5 }
         ]
       },
       titleReadability: {
         name: 'Title Readability',
+        maxScore: 5,
         tests: [
-          'focusKeywordNearBeginning',
-          'titleSentiment',
-          'titlePowerWords',
-          'titleHasNumber'
+          { name: 'focusKeywordNearBeginning', maxScore: 2 },
+          { name: 'titleSentiment', maxScore: 1 },
+          { name: 'titlePowerWords', maxScore: 1 },
+          { name: 'titleHasNumber', maxScore: 1 }
         ]
       },
       contentReadability: {
-        name: 'Content Readability', 
+        name: 'Content Readability',
+        maxScore: 10,
         tests: [
-          'tableOfContents',
-          'shortParagraphs',
-          'contentAssets'
+          { name: 'tableOfContents', maxScore: 2 },
+          { name: 'shortParagraphs', maxScore: 2 },
+          { name: 'contentAssets', maxScore: 6 }
         ]
       }
     };
@@ -86,9 +90,9 @@ export class RankMathSEOEngine {
       contentAssets: 'Add a few images and/or videos to make your content appealing.'
     };
 
-    // Tổng số tests = 20
-    this.totalTests = Object.values(this.categories)
-      .reduce((total, category) => total + category.tests.length, 0);
+    // Tổng điểm tối đa = 94
+    this.maxScore = Object.values(this.categories)
+      .reduce((total, category) => total + category.maxScore, 0);
   }
 
   /**
@@ -109,31 +113,41 @@ export class RankMathSEOEngine {
     const results = {};
     const errors = {};
     
-    // Thực hiện tất cả tests
+    // Thực hiện tất cả tests với điểm chi tiết
+    let totalScore = 0;
+    const categoryScores = {};
+    
     Object.keys(this.categories).forEach(categoryKey => {
       const category = this.categories[categoryKey];
       errors[categoryKey] = [];
+      categoryScores[categoryKey] = 0;
       
-      category.tests.forEach(testName => {
+      category.tests.forEach(testInfo => {
+        const testName = testInfo.name;
+        const maxScore = testInfo.maxScore;
+        
         const testResult = this.runTest(testName, {
           title, content, metaDescription, url, keyword, images, socialData
-        });
+        }, maxScore);
         
         results[testName] = testResult;
+        categoryScores[categoryKey] += testResult.score || 0;
+        totalScore += testResult.score || 0;
         
-        // Nếu test fail -> thêm vào errors
-        if (!testResult.passed) {
+        // Nếu test không đạt điểm tối đa -> thêm vào errors
+        if ((testResult.score || 0) < maxScore) {
           errors[categoryKey].push({
             test: testName,
-            message: this.messages[testName] || testResult.message
+            message: this.messages[testName] || testResult.message,
+            score: testResult.score || 0,
+            maxScore: maxScore
           });
         }
       });
     });
 
-    // Tính điểm theo % tests passed
-    const totalPassed = Object.values(results).filter(r => r.passed).length;
-    const score = Math.round((totalPassed / this.totalTests) * 100);
+    // Điểm tổng là tổng điểm thực tế
+    const score = totalScore;
     const rating = this.getRating(score);
 
     return {
@@ -141,66 +155,66 @@ export class RankMathSEOEngine {
       rating,
       results,
       errors,
-      categories: this.getCategorySummary(errors),
-      totalTests: this.totalTests,
-      passedTests: totalPassed,
+      categories: this.getCategorySummary(errors, categoryScores),
+      maxScore: this.maxScore,
+      categoryScores,
       stats: this.generateStats(title, content, keyword)
     };
   }
 
   /**
-   * Chạy test cụ thể
+   * Chạy test cụ thể với điểm tối đa
    */
-  runTest(testName, data) {
+  runTest(testName, data, maxScore) {
     const { title, content, metaDescription, url, keyword, images } = data;
     
     switch (testName) {
       case 'focusKeywordInTitle':
-        return this.testFocusKeywordInTitle(title, keyword);
+        return this.testFocusKeywordInTitle(title, keyword, maxScore);
       case 'focusKeywordInMetaDescription':
-        return this.testFocusKeywordInMetaDescription(metaDescription, keyword);
+        return this.testFocusKeywordInMetaDescription(metaDescription, keyword, maxScore);
       case 'focusKeywordInURL':
-        return this.testFocusKeywordInURL(url, keyword);
+        return this.testFocusKeywordInURL(url, keyword, maxScore);
       case 'focusKeywordAtBeginning':
-        return this.testFocusKeywordAtBeginning(content, keyword);
+        return this.testFocusKeywordAtBeginning(content, keyword, maxScore);
       case 'focusKeywordInContent':
-        return this.testFocusKeywordInContent(content, keyword);
+        return this.testFocusKeywordInContent(content, keyword, maxScore);
       case 'contentLength':
-        return this.testContentLength(content);
+        return this.testContentLength(content, maxScore);
       case 'focusKeywordInSubheadings':
-        return this.testFocusKeywordInSubheadings(content, keyword);
+        return this.testFocusKeywordInSubheadings(content, keyword, maxScore);
       case 'imageWithFocusKeyword':
-        return this.testImageWithFocusKeyword(content, images, keyword);
+        return this.testImageWithFocusKeyword(content, images, keyword, maxScore);
       case 'keywordDensity':
-        return this.testKeywordDensity(content, keyword);
+        return this.testKeywordDensity(content, keyword, maxScore);
       case 'urlLength':
-        return this.testUrlLength(url);
+        return this.testUrlLength(url, maxScore);
       case 'externalLinks':
-        return this.testExternalLinks(content);
+        return this.testExternalLinks(content, maxScore);
       case 'doFollowLinks':
-        return this.testDoFollowLinks(content);
+        return this.testDoFollowLinks(content, maxScore);
       case 'internalLinks':
-        return this.testInternalLinks(content);
+        return this.testInternalLinks(content, maxScore);
       case 'focusKeywordSet':
-        return this.testFocusKeywordSet(keyword);
+        return this.testFocusKeywordSet(keyword, maxScore);
       case 'contentAI':
-        return this.testContentAI();
+        return this.testContentAI(maxScore);
       case 'focusKeywordNearBeginning':
-        return this.testFocusKeywordNearBeginning(title, keyword);
+        return this.testFocusKeywordNearBeginning(title, keyword, maxScore);
       case 'titleSentiment':
-        return this.testTitleSentiment(title);
+        return this.testTitleSentiment(title, maxScore);
       case 'titlePowerWords':
-        return this.testTitlePowerWords(title);
+        return this.testTitlePowerWords(title, maxScore);
       case 'titleHasNumber':
-        return this.testTitleHasNumber(title);
+        return this.testTitleHasNumber(title, maxScore);
       case 'tableOfContents':
-        return this.testTableOfContents(content);
+        return this.testTableOfContents(content, maxScore);
       case 'shortParagraphs':
-        return this.testShortParagraphs(content);
+        return this.testShortParagraphs(content, maxScore);
       case 'contentAssets':
-        return this.testContentAssets(content);
+        return this.testContentAssets(content, maxScore);
       default:
-        return { passed: false, message: 'Unknown test' };
+        return { passed: false, message: 'Unknown test', score: 0 };
     }
   }
 
@@ -208,62 +222,103 @@ export class RankMathSEOEngine {
   // BASIC SEO TESTS
   // =================================
 
-  testFocusKeywordInTitle(title, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
+  testFocusKeywordInTitle(title, keyword, maxScore = 34) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     const passed = title.toLowerCase().includes(keyword.toLowerCase());
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Focus keyword found in title' : 'Add Focus Keyword to the SEO title.'
+      score,
+      message: passed ? 'Focus keyword found in title' : 'Add Focus Keyword to the SEO title.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testFocusKeywordInMetaDescription(metaDescription, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
-    if (!metaDescription) return { passed: false, message: 'No meta description' };
+  testFocusKeywordInMetaDescription(metaDescription, keyword, maxScore = 2) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!metaDescription) return { passed: false, message: 'No meta description', score: 0 };
     const passed = metaDescription.toLowerCase().includes(keyword.toLowerCase());
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Focus keyword found in meta description' : 'Add Focus Keyword to your SEO Meta Description.'
+      score,
+      message: passed ? 'Focus keyword found in meta description' : 'Add Focus Keyword to your SEO Meta Description.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testFocusKeywordInURL(url, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
-    if (!url) return { passed: false, message: 'No URL provided' };
+  testFocusKeywordInURL(url, keyword, maxScore = 1) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!url) return { passed: false, message: 'No URL provided', score: 0 };
     const keywordSlug = keyword.replace(/\s+/g, '-').toLowerCase();
     const passed = url.toLowerCase().includes(keyword.toLowerCase()) || 
                    url.toLowerCase().includes(keywordSlug);
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Focus keyword found in URL' : 'Use Focus Keyword in the URL.'
+      score,
+      message: passed ? 'Focus keyword found in URL' : 'Use Focus Keyword in the URL.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testFocusKeywordAtBeginning(content, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
+  testFocusKeywordAtBeginning(content, keyword, maxScore = 3) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     const firstParagraph = content.split(/\n\s*\n/)[0] || content.substring(0, 300);
     const passed = firstParagraph.toLowerCase().includes(keyword.toLowerCase());
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Focus keyword found at beginning' : 'Use Focus Keyword at the beginning of your content.'
+      score,
+      message: passed ? 'Focus keyword found at beginning' : 'Use Focus Keyword at the beginning of your content.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testFocusKeywordInContent(content, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
+  testFocusKeywordInContent(content, keyword, maxScore = 3) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     const passed = content.toLowerCase().includes(keyword.toLowerCase());
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Focus keyword found in content' : 'Use Focus Keyword in the content.'
+      score,
+      message: passed ? 'Focus keyword found in content' : 'Use Focus Keyword in the content.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testContentLength(content) {
+  testContentLength(content, maxScore = 7) {
     const wordCount = this.countWords(content);
-    const passed = wordCount >= 600 && wordCount <= 2500;
+    let score = 0;
+    let message = '';
+    
+    if (wordCount < 600) {
+      score = 0;
+      message = `Content is ${wordCount} words long. Add more content.`;
+    } else if (wordCount <= 1000) {
+      score = 1;
+      message = `Content is ${wordCount} words long. Good job!`;
+    } else if (wordCount <= 1500) {
+      score = 2;
+      message = `Content is ${wordCount} words long. Good job!`;
+    } else if (wordCount <= 2000) {
+      score = 3;
+      message = `Content is ${wordCount} words long. Good job!`;
+    } else if (wordCount <= 2500) {
+      score = 4;
+      message = `Content is ${wordCount} words long. Good job!`;
+    } else {
+      score = 7; // >2500 words gets max score
+      message = `Content is ${wordCount} words long. Excellent!`;
+    }
+    
+    const passed = score > 0;
     return { 
       passed, 
-      message: passed ? `Content length is good (${wordCount} words)` : 'Content should be 600-2500 words long.'
+      score,
+      wordCount,
+      message,
+      scoreText: `${score}/${maxScore}`
     };
   }
 
@@ -271,8 +326,8 @@ export class RankMathSEOEngine {
   // ADDITIONAL TESTS
   // =================================
 
-  testFocusKeywordInSubheadings(content, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
+  testFocusKeywordInSubheadings(content, keyword, maxScore = 2) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     const headingRegex = /<h[2-6][^>]*>(.*?)<\/h[2-6]>/gi;
     const headings = [];
     let match;
@@ -285,14 +340,18 @@ export class RankMathSEOEngine {
       heading.toLowerCase().includes(keyword.toLowerCase())
     );
     
+    const score = passed ? maxScore : 0;
+    
     return { 
       passed, 
-      message: passed ? 'Focus keyword found in subheadings' : 'Use Focus Keyword in subheading(s) like H2, H3, H4, etc..'
+      score,
+      message: passed ? 'Focus keyword found in subheadings' : 'Use Focus Keyword in subheading(s) like H2, H3, H4, etc..',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testImageWithFocusKeyword(content, images, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
+  testImageWithFocusKeyword(content, images, keyword, maxScore = 1) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     
     let foundInImages = false;
     let foundInContent = false;
@@ -320,38 +379,68 @@ export class RankMathSEOEngine {
     }
     
     const passed = foundInImages || foundInContent;
+    const score = passed ? maxScore : 0;
     
     return { 
       passed, 
-      message: passed ? 'Image with focus keyword alt text found' : 'Add an image with your Focus Keyword as alt text.'
+      score,
+      message: passed ? 'Image with focus keyword alt text found' : 'Add an image with your Focus Keyword as alt text.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testKeywordDensity(content, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
+  testKeywordDensity(content, keyword, maxScore = 6) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     const wordCount = this.countWords(content);
     const keywordCount = this.countKeywordOccurrences(content, keyword);
     const density = wordCount > 0 ? (keywordCount / wordCount) * 100 : 0;
     
-    const passed = density >= 0.5 && density <= 2.5;
+    let score = 0;
+    let message = '';
+    
+    if (density === 0 || density < 0.5) {
+      score = 0;
+      message = `Keyword Density is ${density.toFixed(1)}%. Aim for around 1% Keyword Density.`;
+    } else if (density >= 0.5 && density < 0.75) {
+      score = 2;
+      message = `Keyword density is ${density.toFixed(2)}%, the Focus Keyword appears ${keywordCount} times.`;
+    } else if (density >= 0.75 && density < 1.0) {
+      score = 3;
+      message = `Keyword density is ${density.toFixed(2)}%, the Focus Keyword appears ${keywordCount} times.`;
+    } else if (density >= 1.0 && density <= 2.5) {
+      score = 6;
+      message = `Keyword density is ${density.toFixed(2)}%, the Focus Keyword appears ${keywordCount} times.`;
+    } else {
+      score = 0;
+      message = `Keyword Density is ${density.toFixed(1)}%. Too high! Aim for around 1% Keyword Density.`;
+    }
+    
+    const passed = score > 0;
     return { 
       passed, 
-      message: passed ? `Keyword density is good (${density.toFixed(2)}%)` : `Keyword Density is ${density.toFixed(1)}%. Aim for around 1% Keyword Density.`
+      score,
+      density,
+      keywordCount,
+      message,
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testUrlLength(url) {
-    if (!url) return { passed: false, message: 'No URL provided' };
+  testUrlLength(url, maxScore = 4) {
+    if (!url) return { passed: false, message: 'No URL provided', score: 0 };
     const length = url.length;
     const passed = length <= 75;
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? `URL is ${length} characters long. Kudos!` : `URL is too long (${length} characters)`,
-      length: length
+      score,
+      message: passed ? `URL is ${length} characters long. Kudos!` : `URL is ${length} characters long. Consider shortening it.`,
+      length: length,
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testExternalLinks(content) {
+  testExternalLinks(content, maxScore = 4) {
     // Tìm tất cả links trong content
     const linkRegex = /<a[^>]*href=["|']([^"']*)["|'][^>]*>/gi;
     const links = [];
@@ -365,17 +454,20 @@ export class RankMathSEOEngine {
     const externalLinks = links.filter(link => !isInternalLink(link) && (link.startsWith('http://') || link.startsWith('https://')));
     
     const passed = externalLinks.length > 0;
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
+      score,
       message: passed 
-        ? `Found ${externalLinks.length} external links` 
+        ? `Great! You are linking to ${externalLinks.length} external resources.` 
         : 'Link out to external resources.',
       count: externalLinks.length,
-      externalLinks: externalLinks
+      externalLinks: externalLinks,
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testDoFollowLinks(content) {
+  testDoFollowLinks(content, maxScore = 2) {
     // Tìm tất cả links với attributes
     const linkRegex = /<a[^>]*href=["|']([^"']*)["|'][^>]*>/gi;
     const links = [];
@@ -395,17 +487,20 @@ export class RankMathSEOEngine {
     }
     
     const passed = links.length > 0;
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
+      score,
       message: passed 
-        ? `Found ${links.length} external DoFollow links` 
+        ? `At least ${links.length} external link with DoFollow found in your content.` 
         : 'Add DoFollow links pointing to external resources.',
       count: links.length,
-      doFollowLinks: links
+      doFollowLinks: links,
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testInternalLinks(content) {
+  testInternalLinks(content, maxScore = 4) {
     // Tìm tất cả links trong content
     const linkRegex = /<a[^>]*href=["|']([^"']*)["|'][^>]*>/gi;
     const links = [];
@@ -419,30 +514,40 @@ export class RankMathSEOEngine {
     const internalLinks = links.filter(link => isInternalLink(link));
     
     const passed = internalLinks.length > 0;
+    const score = passed ? maxScore : 0;
     
     return { 
       passed, 
+      score,
       message: passed 
-        ? `Found ${internalLinks.length} internal links pointing to ${FRONTEND_PUBLIC_URL}` 
+        ? `You are linking to ${internalLinks.length} other resources on your website which is great.` 
         : `Add internal links in your content pointing to your website (${FRONTEND_PUBLIC_URL}).`,
       count: internalLinks.length,
-      internalLinks: internalLinks
+      internalLinks: internalLinks,
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testFocusKeywordSet(keyword) {
+  testFocusKeywordSet(keyword, maxScore = 1) {
     const passed = keyword && keyword.trim().length > 0;
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Focus keyword is set' : 'Set a Focus Keyword for this content.'
+      score,
+      message: passed ? "You haven't used this Focus Keyword before." : 'Set a Focus Keyword for this content.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testContentAI() {
+  testContentAI(maxScore = 5) {
     // Giả định content AI được sử dụng
+    const passed = true;
+    const score = maxScore;
     return { 
-      passed: true, 
-      message: 'You are using Content AI to optimise this Post.'
+      passed, 
+      score,
+      message: 'You are using Content AI to optimise this Post.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
@@ -450,17 +555,20 @@ export class RankMathSEOEngine {
   // TITLE READABILITY TESTS
   // =================================
 
-  testFocusKeywordNearBeginning(title, keyword) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set' };
+  testFocusKeywordNearBeginning(title, keyword, maxScore = 2) {
+    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     const keywordIndex = title.toLowerCase().indexOf(keyword.toLowerCase());
     const passed = keywordIndex >= 0 && keywordIndex <= 10;
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Focus keyword near beginning of title' : 'Use the Focus Keyword near the beginning of SEO title.'
+      score,
+      message: passed ? 'Focus Keyword used at the beginning of SEO title.' : 'Use the Focus Keyword near the beginning of SEO title.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testTitleSentiment(title) {
+  testTitleSentiment(title, maxScore = 1) {
     const positiveWords = [
       'best', 'amazing', 'incredible', 'outstanding', 'excellent', 'perfect',
       'ultimate', 'superior', 'fantastic', 'wonderful', 'great', 'awesome'
@@ -476,13 +584,16 @@ export class RankMathSEOEngine {
     const hasNegative = negativeWords.some(word => titleLower.includes(word));
     
     const passed = hasPositive || hasNegative;
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Title has emotional sentiment' : 'Titles with positive or negative sentiment work best for higher CTR.'
+      score,
+      message: passed ? 'Your title has a positive or a negative sentiment.' : 'Titles with positive or negative sentiment work best for higher CTR.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testTitlePowerWords(title) {
+  testTitlePowerWords(title, maxScore = 1) {
     const powerWords = [
       'free', 'new', 'proven', 'results', 'easy', 'step', 'guide', 'how',
       'ultimate', 'complete', 'essential', 'exclusive', 'limited', 'secret',
@@ -491,17 +602,23 @@ export class RankMathSEOEngine {
     
     const titleLower = title.toLowerCase();
     const passed = powerWords.some(word => titleLower.includes(word));
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Title contains power words' : 'Add power words to your title to increase CTR.'
+      score,
+      message: passed ? 'Your title contains power word(s). Booyah!' : 'Add power words to your title to increase CTR.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testTitleHasNumber(title) {
+  testTitleHasNumber(title, maxScore = 1) {
     const passed = /\d/.test(title);
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Title contains numbers' : 'Add a number to your title to improve CTR.'
+      score,
+      message: passed ? 'You are using a number in your SEO title.' : 'Add a number to your title to improve CTR.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
@@ -509,7 +626,7 @@ export class RankMathSEOEngine {
   // CONTENT READABILITY TESTS
   // =================================
 
-  testTableOfContents(content) {
+  testTableOfContents(content, maxScore = 2) {
     const tocPatterns = [
       /table\s+of\s+contents/i,
       /mục\s+lục/i,
@@ -518,31 +635,71 @@ export class RankMathSEOEngine {
     ];
     
     const passed = tocPatterns.some(pattern => pattern.test(content));
+    const score = passed ? maxScore : 0;
     return { 
       passed, 
-      message: passed ? 'Table of contents found' : 'Use Table of Content to break-down your text.'
+      score,
+      message: passed ? 'You are using Table of Contents to break-down your text.' : 'Use Table of Content to break-down your text.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testShortParagraphs(content) {
+  testShortParagraphs(content, maxScore = 2) {
     const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     const longParagraphs = paragraphs.filter(p => this.countWords(p) > 150);
     const passed = longParagraphs.length < paragraphs.length * 0.3; // Tối đa 30% đoạn dài
+    const score = passed ? maxScore : 0;
     
     return { 
       passed, 
-      message: passed ? 'Paragraphs are appropriately sized' : 'Add short and concise paragraphs for better readability and UX.'
+      score,
+      message: passed ? 'You are using short paragraphs.' : 'At least one paragraph is long. Consider using short paragraphs.',
+      scoreText: `${score}/${maxScore}`
     };
   }
 
-  testContentAssets(content) {
-    const hasImages = /<img[^>]*>/i.test(content);
+  testContentAssets(content, maxScore = 6) {
+    // Đếm số ảnh
+    const imgMatches = content.match(/<img[^>]*>/gi) || [];
+    const imageCount = imgMatches.length;
+    
+    // Đếm video
     const hasVideos = /<video[^>]*>|<iframe[^>]*>/i.test(content);
-    const passed = hasImages || hasVideos;
+    
+    let score = 0;
+    let message = '';
+    
+    if (imageCount === 0 && !hasVideos) {
+      score = 0;
+      message = 'Add a few images and/or videos to make your content appealing.';
+    } else if (imageCount === 1) {
+      score = 1;
+      message = 'Your content contains images and/or video(s).';
+    } else if (imageCount === 2) {
+      score = 2;
+      message = 'Your content contains images and/or video(s).';
+    } else if (imageCount === 3) {
+      score = 4;
+      message = 'Your content contains images and/or video(s).';
+    } else if (imageCount >= 4) {
+      score = 6;
+      message = 'Your content contains images and/or video(s).';
+    }
+    
+    // Bonus for videos
+    if (hasVideos && score < maxScore) {
+      score = Math.min(score + 1, maxScore);
+    }
+    
+    const passed = score > 0;
     
     return { 
       passed, 
-      message: passed ? 'Content has visual assets' : 'Add a few images and/or videos to make your content appealing.'
+      score,
+      imageCount,
+      hasVideos,
+      message,
+      scoreText: `${score}/${maxScore}`
     };
   }
 
@@ -550,25 +707,27 @@ export class RankMathSEOEngine {
   // HELPER METHODS
   // =================================
 
-  getCategorySummary(errors) {
+  getCategorySummary(errors, categoryScores) {
     const summary = {};
     Object.keys(this.categories).forEach(categoryKey => {
       const category = this.categories[categoryKey];
       summary[categoryKey] = {
         name: category.name,
-        totalTests: category.tests.length,
+        maxScore: category.maxScore,
+        score: categoryScores[categoryKey] || 0,
         errors: errors[categoryKey].length,
-        passed: category.tests.length - errors[categoryKey].length
+        tests: category.tests
       };
     });
     return summary;
   }
 
   getRating(score) {
-    if (score >= 90) return 'excellent';
-    if (score >= 70) return 'good';
-    if (score >= 50) return 'ok';
-    if (score >= 30) return 'poor';
+    // Rating dựa trên điểm tuyệt đối (max 94)
+    if (score >= 85) return 'excellent';  // ~90%
+    if (score >= 66) return 'good';       // ~70%
+    if (score >= 47) return 'ok';         // ~50%
+    if (score >= 28) return 'poor';       // ~30%
     return 'bad';
   }
 

@@ -68,29 +68,56 @@ export const useRankMathSEONew = ({
     const categoryData = analysis.categories[categoryKey];
     const categoryErrors = analysis.errors?.[categoryKey] || [];
     
-    // Tính toán passed tests cho category này
+    // Tính toán passed tests cho category này với hệ thống điểm mới
     const passedTests = [];
+    const failedTests = [];
+    let categoryTests = [];
+    
     if (analysis?.results && rankMathEngine.categories[categoryKey]) {
-      const categoryTests = rankMathEngine.categories[categoryKey].tests;
-      categoryTests.forEach(testName => {
+      categoryTests = rankMathEngine.categories[categoryKey].tests;
+      
+      categoryTests.forEach(testInfo => {
+        const testName = testInfo.name;
         const testResult = analysis.results[testName];
-        if (testResult && testResult.passed) {
-          passedTests.push({
-            test: testName,
-            message: rankMathEngine.getSuccessMessage(testName, testResult)
-          });
+        
+        if (testResult) {
+          const currentScore = testResult.score || 0;
+          const maxScore = testInfo.maxScore;
+          
+          // Test được coi là passed khi đạt điểm tối đa
+          if (currentScore === maxScore && testResult.passed) {
+            passedTests.push({
+              test: testName,
+              message: rankMathEngine.getSuccessMessage(testName, testResult),
+              score: testResult.score,
+              maxScore: testInfo.maxScore,
+              scoreText: testResult.scoreText
+            });
+          } else {
+            failedTests.push({
+              test: testName,
+              message: testResult.message,
+              score: testResult.score || 0,
+              maxScore: testInfo.maxScore,
+              scoreText: testResult.scoreText || `${currentScore}/${maxScore}`
+            });
+          }
         }
       });
     }
     
     return {
       name: categoryData.name,
-      totalTests: categoryData.totalTests,
-      passedTests: categoryData.passed,
-      failedTests: categoryData.errors,
+      maxScore: categoryData.maxScore,
+      score: categoryData.score,
+      tests: categoryData.tests,
       errors: categoryErrors,
       passedTestsList: passedTests, // Danh sách chi tiết các test đã pass
-      score: categoryData.totalTests > 0 ? Math.round((categoryData.passed / categoryData.totalTests) * 100) : 0
+      failedTestsList: failedTests, // Danh sách chi tiết các test đã fail
+      passedCount: passedTests.length,
+      failedCount: failedTests.length,
+      totalTests: categoryTests.length,
+      percentage: categoryData.maxScore > 0 ? Math.round((categoryData.score / categoryData.maxScore) * 100) : 0
     };
   }, [analysis]);
 
@@ -130,15 +157,27 @@ export const useRankMathSEONew = ({
           categoryName,
           test: error.test,
           message: error.message,
+          score: error.score || 0,
+          maxScore: error.maxScore,
+          scoreText: `${error.score || 0}/${error.maxScore}`,
           priority: categoryKey === 'basicSEO' ? 'high' : 
                    categoryKey === 'additional' ? 'medium' : 'low'
         });
       });
     });
     
-    // Sort by priority
+    // Sort by priority and score impact
     const priorityOrder = { high: 3, medium: 2, low: 1 };
-    return allSuggestions.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+    return allSuggestions.sort((a, b) => {
+      // Sort by priority first
+      const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+      
+      // Then by score impact (missing points)
+      const aMissingPoints = (a.maxScore || 0) - (a.score || 0);
+      const bMissingPoints = (b.maxScore || 0) - (b.score || 0);
+      return bMissingPoints - aMissingPoints;
+    });
   }, [analysis]);
 
   // Get high priority suggestions (Basic SEO errors)
