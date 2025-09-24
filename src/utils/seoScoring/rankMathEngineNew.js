@@ -644,19 +644,40 @@ export class RankMathSEOEngine {
     };
   }
 
-  testShortParagraphs(content, maxScore = 3) {
-    const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-    const longParagraphs = paragraphs.filter(p => this.countWords(p) > 150);
-    const passed = longParagraphs.length < paragraphs.length * 0.3; // Tối đa 30% đoạn dài
-    const score = passed ? maxScore : 0;
-    
-    return { 
-      passed, 
-      score,
-      message: passed ? 'You are using short paragraphs.' : 'At least one paragraph is long. Consider using short paragraphs.',
-      scoreText: `${score}/${maxScore}`
-    };
+  // Thay thế trong class RankMathSEOEngine
+testShortParagraphs(content, maxScore = 3) {
+  // 1) Tách theo <p>... </p> giống Rank Math
+  const pMatches = [...content.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)];
+  let paragraphs;
+  if (pMatches.length) {
+    paragraphs = pMatches.map(m => m[1]);
+  } else {
+    // 2) Fallback khi không có <p>: quy đổi <br> và các block tag thành xuống dòng rồi tách theo \n\n
+    const normalized = content
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(h[1-6]|div|section|article|li|blockquote|pre|table|figure|p)>/gi, '$&\n');
+    paragraphs = normalized.split(/\n\s*\n/);
   }
+
+  // Làm sạch, bỏ tag, loại bỏ đoạn rỗng
+  paragraphs = paragraphs
+    .map(p => p.replace(/<[^>]*>/g, ' ').trim())
+    .filter(p => p.length > 0);
+
+  // 3) Chuẩn Rank Math: TRƯỢT nếu có ÍT NHẤT 1 đoạn > 120 từ
+  const hasLong = paragraphs.some(p => this.countWords(p) > 120);
+  const passed = !hasLong;
+  const score = passed ? maxScore : 0;
+
+  return {
+    passed,
+    score,
+    message: passed
+      ? 'You are using short paragraphs.'
+      : 'At least one paragraph is long. Consider using short paragraphs.',
+    scoreText: `${score}/${maxScore}`
+  };
+}
 
   testContentAssets(content, maxScore = 6) {
     // Đếm số ảnh
