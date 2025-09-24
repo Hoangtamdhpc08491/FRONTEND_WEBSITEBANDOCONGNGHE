@@ -252,7 +252,7 @@ const RankMathSEOScoreNew = ({
         </Box>
 
         {/* Categories summary */}
-        {categoriesSummary && categoriesSummary.length > 0 && (
+        {/* {categoriesSummary && categoriesSummary.length > 0 && (
           <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
               Tổng quan theo danh mục Rank Math:
@@ -274,7 +274,7 @@ const RankMathSEOScoreNew = ({
               ))}
             </Grid>
           </Alert>
-        )}
+        )} */}
 
         {/* Chi tiết theo category */}
         {showDetails && (

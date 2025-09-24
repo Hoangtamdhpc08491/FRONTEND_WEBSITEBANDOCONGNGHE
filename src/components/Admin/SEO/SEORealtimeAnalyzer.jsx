@@ -171,7 +171,7 @@ const SEORealtimeAnalyzer = ({
           
           {/* Category Scores */}
           <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
-            Điểm theo danh mục
+            Điểm theo danh 
           </Typography>
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={6} sm={3}>

@@ -42,6 +42,7 @@ const SEORealtimeAnalyzer = ({
   const [localMetaDescription, setLocalMetaDescription] = useState(metaDescription);
   const [localSlug, setLocalSlug] = useState(slug);
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+  const [showAllIssues, setShowAllIssues] = useState(false);
 
   // Calculate full URL from slug using environment URL
   const fullUrl = localSlug ? `${FRONTEND_PUBLIC_URL}/tin-tuc/${localSlug}` : `${FRONTEND_PUBLIC_URL}/tin-tuc/`;
@@ -308,11 +309,11 @@ const SEORealtimeAnalyzer = ({
         <Collapse in={isExpanded}>
           <Divider sx={{ my: 2 }} />
           
-          {/* Category Scores */}
+          {/* Category Scores
           <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
             Điểm theo danh mục
-          </Typography>
-          <Grid container spacing={2} sx={{ mb: 3 }}>
+          </Typography> */}
+          {/* <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={6} sm={3}>
               <Box sx={{ textAlign: 'center', p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="h4" sx={{ color: categoryScores.basic >= 70 ? 'success.main' : categoryScores.basic >= 50 ? 'warning.main' : 'error.main' }}>
@@ -345,10 +346,10 @@ const SEORealtimeAnalyzer = ({
                 <Typography variant="caption">Title Readability</Typography>
               </Box>
             </Grid>
-          </Grid>
+          </Grid> */}
 
           {/* SEO Status Badges */}
-          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+          {/* <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
             <Alert 
               severity={passesExcellentSEO ? "success" : "info"} 
               variant={passesExcellentSEO ? "filled" : "outlined"}
@@ -370,16 +371,28 @@ const SEORealtimeAnalyzer = ({
             >
               Cơ bản (50+): {passesBasicSEO ? '✅' : '❌'}
             </Alert>
-          </Stack>
+          </Stack> */}
 
           {/* Priority Improvements */}
           {improvementSuggestions.length > 0 && (
             <Alert severity="warning" sx={{ mb: 2 }}>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                Ưu tiên cải thiện ({improvementSuggestions.length} vấn đề):
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  Ưu tiên cải thiện ({improvementSuggestions.length} vấn đề):
+                </Typography>
+                {improvementSuggestions.length > 5 && (
+                  <Button 
+                    size="small" 
+                    variant="text" 
+                    color="inherit" 
+                    onClick={() => setShowAllIssues(!showAllIssues)}
+                  >
+                    {showAllIssues ? 'Ẩn bớt' : 'Xem tất cả'}
+                  </Button>
+                )}
+              </Box>
               <Box component="ul" sx={{ m: 0, pl: 2 }}>
-                {improvementSuggestions.slice(0, 5).map((suggestion, index) => (
+                {(showAllIssues ? improvementSuggestions : improvementSuggestions.slice(0, 5)).map((suggestion, index) => (
                   <li key={index}>
                     <Typography variant="body2">
                       {suggestion.priority === 'high' ? '🔴' : '🟡'} {suggestion.message}
@@ -387,35 +400,15 @@ const SEORealtimeAnalyzer = ({
                   </li>
                 ))}
               </Box>
+              {!showAllIssues && improvementSuggestions.length > 5 && (
+                <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 1, color: 'text.secondary' }}>
+                  ...và {improvementSuggestions.length - 5} vấn đề khác
+                </Typography>
+              )}
             </Alert>
           )}
 
-          {/* Content Statistics */}
-          <Typography variant="h6" sx={{ mb: 1, color: 'primary.main' }}>
-            Thống kê nội dung
-          </Typography>
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Số từ: <strong>{stats?.wordCount || 0}</strong>
-              </Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Độ dài tiêu đề: <strong>{stats?.titleLength || 0}</strong>
-              </Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Mật độ keyword: <strong>{stats?.keywordDensity || 0}%</strong>
-              </Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Lần xuất hiện: <strong>{stats?.keywordCount || 0}</strong>
-              </Typography>
-            </Grid>
-          </Grid>
+         
         </Collapse>
       </CardContent>
     </Card>
