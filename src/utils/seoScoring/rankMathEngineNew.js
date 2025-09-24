@@ -11,11 +11,11 @@ export class RankMathSEOEngine {
     this.categories = {
       basicSEO: {
         name: 'Basic SEO',
-        maxScore: 50,
+        maxScore: 54,
         tests: [
           { name: 'focusKeywordInTitle', maxScore: 34 },
           { name: 'focusKeywordInMetaDescription', maxScore: 2 }, 
-          { name: 'focusKeywordInURL', maxScore: 1 },
+          { name: 'focusKeywordInURL', maxScore: 5 },
           { name: 'focusKeywordAtBeginning', maxScore: 3 },
           { name: 'focusKeywordInContent', maxScore: 3 },
           { name: 'contentLength', maxScore: 7 }
@@ -23,16 +23,16 @@ export class RankMathSEOEngine {
       },
       additional: {
         name: 'Additional',
-        maxScore: 29,
+        maxScore: 30,
         tests: [
           { name: 'focusKeywordInSubheadings', maxScore: 2 },
-          { name: 'imageWithFocusKeyword', maxScore: 1 },
+          { name: 'imageWithFocusKeyword', maxScore: 2 },
           { name: 'keywordDensity', maxScore: 6 },
           { name: 'urlLength', maxScore: 4 },
           { name: 'externalLinks', maxScore: 4 },
           { name: 'doFollowLinks', maxScore: 2 },
-          { name: 'internalLinks', maxScore: 4 },
-          { name: 'focusKeywordSet', maxScore: 1 },
+          { name: 'internalLinks', maxScore: 5 },
+          { name: 'focusKeywordSet', maxScore: 0 },
           { name: 'contentAI', maxScore: 5 }
         ]
       },
@@ -48,10 +48,10 @@ export class RankMathSEOEngine {
       },
       contentReadability: {
         name: 'Content Readability',
-        maxScore: 10,
+        maxScore: 11,
         tests: [
           { name: 'tableOfContents', maxScore: 2 },
-          { name: 'shortParagraphs', maxScore: 2 },
+          { name: 'shortParagraphs', maxScore: 3 },
           { name: 'contentAssets', maxScore: 6 }
         ]
       }
@@ -247,7 +247,7 @@ export class RankMathSEOEngine {
     };
   }
 
-  testFocusKeywordInURL(url, keyword, maxScore = 1) {
+  testFocusKeywordInURL(url, keyword, maxScore = 5) {
     if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     if (!url) return { passed: false, message: 'No URL provided', score: 0 };
     const keywordSlug = keyword.replace(/\s+/g, '-').toLowerCase();
@@ -350,7 +350,7 @@ export class RankMathSEOEngine {
     };
   }
 
-  testImageWithFocusKeyword(content, images, keyword, maxScore = 1) {
+  testImageWithFocusKeyword(content, images, keyword, maxScore = 2) {
     if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
     
     let foundInImages = false;
@@ -500,7 +500,7 @@ export class RankMathSEOEngine {
     };
   }
 
-  testInternalLinks(content, maxScore = 4) {
+  testInternalLinks(content, maxScore = 5) {
     // Tìm tất cả links trong content
     const linkRegex = /<a[^>]*href=["|']([^"']*)["|'][^>]*>/gi;
     const links = [];
@@ -528,7 +528,7 @@ export class RankMathSEOEngine {
     };
   }
 
-  testFocusKeywordSet(keyword, maxScore = 1) {
+  testFocusKeywordSet(keyword, maxScore = 0) {
     const passed = keyword && keyword.trim().length > 0;
     const score = passed ? maxScore : 0;
     return { 
@@ -644,7 +644,7 @@ export class RankMathSEOEngine {
     };
   }
 
-  testShortParagraphs(content, maxScore = 2) {
+  testShortParagraphs(content, maxScore = 3) {
     const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     const longParagraphs = paragraphs.filter(p => this.countWords(p) > 150);
     const passed = longParagraphs.length < paragraphs.length * 0.3; // Tối đa 30% đoạn dài
@@ -723,11 +723,11 @@ export class RankMathSEOEngine {
   }
 
   getRating(score) {
-    // Rating dựa trên điểm tuyệt đối (max 94)
-    if (score >= 85) return 'excellent';  // ~90%
-    if (score >= 66) return 'good';       // ~70%
-    if (score >= 47) return 'ok';         // ~50%
-    if (score >= 28) return 'poor';       // ~30%
+    // Rating dựa trên điểm tuyệt đối (max 100)
+    if (score >= 90) return 'excellent';  // 90%
+    if (score >= 70) return 'good';       // 70%
+    if (score >= 50) return 'ok';         // 50%
+    if (score >= 30) return 'poor';       // 30%
     return 'bad';
   }
 
