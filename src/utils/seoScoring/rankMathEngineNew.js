@@ -57,37 +57,37 @@ export class RankMathSEOEngine {
       }
     };
 
-    // Messages giống Rank Math Demo
+    // Messages song ngữ Tiếng Việt và Tiếng Anh
     this.messages = {
       // Basic SEO
-      focusKeywordInTitle: 'Add Focus Keyword to the SEO title.',
-      focusKeywordInMetaDescription: 'Add Focus Keyword to your SEO Meta Description.',
-      focusKeywordInURL: 'Use Focus Keyword in the URL.',
-      focusKeywordAtBeginning: 'Use Focus Keyword at the beginning of your content.',
-      focusKeywordInContent: 'Use Focus Keyword in the content.',
-      contentLength: 'Content should be 600-2500 words long.',
+      focusKeywordInTitle: 'Thêm Từ khóa chính vào tiêu đề SEO. (Add Focus Keyword to the SEO title)',
+      focusKeywordInMetaDescription: 'Thêm Từ khóa chính vào Mô tả Meta SEO của bạn. (Add Focus Keyword to your SEO Meta Description)',
+      focusKeywordInURL: 'Sử dụng Từ khóa chính trong URL. (Use Focus Keyword in the URL)',
+      focusKeywordAtBeginning: 'Sử dụng Từ khóa chính ở đầu nội dung của bạn. (Use Focus Keyword at the beginning of your content)',
+      focusKeywordInContent: 'Sử dụng Từ khóa chính trong nội dung. (Use Focus Keyword in the content)',
+      contentLength: 'Nội dung nên dài từ 600-2500 từ. (Content should be 600-2500 words long)',
       
       // Additional
-      focusKeywordInSubheadings: 'Use Focus Keyword in subheading(s) like H2, H3, H4, etc..',
-      imageWithFocusKeyword: 'Add an image with your Focus Keyword as alt text.',
-      keywordDensity: 'Keyword Density is 0. Aim for around 1% Keyword Density.',
-      urlLength: 'URL should be under 75 characters long.',
-      externalLinks: 'Link out to external resources.',
-      doFollowLinks: 'Add DoFollow links pointing to external resources.',
-      internalLinks: 'Add internal links in your content.',
-      focusKeywordSet: 'Set a Focus Keyword for this content.',
-      contentAI: 'You are using Content AI to optimise this Post.',
+      focusKeywordInSubheadings: 'Sử dụng Từ khóa chính trong (các) tiêu đề phụ như H2, H3, H4, v.v. (Use Focus Keyword in subheading(s) like H2, H3, H4, etc.)',
+      imageWithFocusKeyword: 'Thêm một hình ảnh với Từ khóa chính của bạn làm văn bản thay thế (alt text). (Add an image with your Focus Keyword as alt text)',
+      keywordDensity: 'Mật độ Từ khóa là 0. Hãy nhắm đến khoảng 1% Mật độ Từ khóa. (Keyword Density is 0. Aim for around 1% Keyword Density)',
+      urlLength: 'URL nên ngắn hơn 75 ký tự. (URL should be under 75 characters long)',
+      externalLinks: 'Liên kết đến các nguồn tài nguyên bên ngoài. (Link out to external resources)',
+      doFollowLinks: 'Thêm liên kết DoFollow trỏ đến các nguồn tài nguyên bên ngoài. (Add DoFollow links pointing to external resources)',
+      internalLinks: 'Thêm liên kết nội bộ trong nội dung của bạn. (Add internal links in your content)',
+      focusKeywordSet: 'Đặt một Từ khóa chính cho nội dung này. (Set a Focus Keyword for this content)',
+      contentAI: 'Bạn đang sử dụng Content AI để tối ưu hóa Bài đăng này. (You are using Content AI to optimise this Post)',
       
       // Title Readability
-      focusKeywordNearBeginning: 'Use the Focus Keyword near the beginning of SEO title.',
-      titleSentiment: 'Titles with positive or negative sentiment work best for higher CTR.',
-      titlePowerWords: 'Add power words to your title to increase CTR.',
-      titleHasNumber: 'Add a number to your title to improve CTR.',
+      focusKeywordNearBeginning: 'Sử dụng Từ khóa chính gần đầu tiêu đề SEO. (Use the Focus Keyword near the beginning of SEO title)',
+      titleSentiment: 'Tiêu đề có cảm xúc tích cực hoặc tiêu cực hoạt động tốt nhất để tăng CTR. (Titles with positive or negative sentiment work best for higher CTR)',
+      titlePowerWords: 'Thêm từ ngữ mạnh mẽ vào tiêu đề của bạn để tăng CTR. (Add power words to your title to increase CTR)',
+      titleHasNumber: 'Thêm một số vào tiêu đề của bạn để cải thiện CTR. (Add a number to your title to improve CTR)',
       
       // Content Readability
-      tableOfContents: 'Use Table of Content to break-down your text.',
-      shortParagraphs: 'Add short and concise paragraphs for better readability and UX.',
-      contentAssets: 'Add a few images and/or videos to make your content appealing.'
+      tableOfContents: 'Sử dụng Mục lục để phân chia văn bản của bạn. (Use Table of Content to break-down your text)',
+      shortParagraphs: 'Thêm các đoạn văn ngắn gọn và súc tích để đọc dễ dàng hơn và trải nghiệm người dùng tốt hơn. (Add short and concise paragraphs for better readability and UX)',
+      contentAssets: 'Thêm một vài hình ảnh và/hoặc video để làm cho nội dung của bạn hấp dẫn hơn. (Add a few images and/or videos to make your content appealing)'
     };
 
     // Tổng điểm tối đa = 94
@@ -223,33 +223,33 @@ export class RankMathSEOEngine {
   // =================================
 
   testFocusKeywordInTitle(title, keyword, maxScore = 34) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
     const passed = title.toLowerCase().includes(keyword.toLowerCase());
     const score = passed ? maxScore : 0;
     return { 
       passed, 
       score,
-      message: passed ? 'Focus keyword found in title' : 'Add Focus Keyword to the SEO title.',
+      message: passed ? 'Từ khóa chính được tìm thấy trong tiêu đề (Focus keyword found in title)' : 'Thêm Từ khóa chính vào tiêu đề SEO. (Add Focus Keyword to the SEO title)',
       scoreText: `${score}/${maxScore}`
     };
   }
 
   testFocusKeywordInMetaDescription(metaDescription, keyword, maxScore = 2) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
-    if (!metaDescription) return { passed: false, message: 'No meta description', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
+    if (!metaDescription) return { passed: false, message: 'Chưa có mô tả Meta (No meta description)', score: 0 };
     const passed = metaDescription.toLowerCase().includes(keyword.toLowerCase());
     const score = passed ? maxScore : 0;
     return { 
       passed, 
       score,
-      message: passed ? 'Focus keyword found in meta description' : 'Add Focus Keyword to your SEO Meta Description.',
+      message: passed ? 'Từ khóa chính được tìm thấy trong mô tả Meta (Focus keyword found in meta description)' : 'Thêm Từ khóa chính vào Mô tả Meta SEO của bạn. (Add Focus Keyword to your SEO Meta Description)',
       scoreText: `${score}/${maxScore}`
     };
   }
 
   testFocusKeywordInURL(url, keyword, maxScore = 5) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
-    if (!url) return { passed: false, message: 'No URL provided', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
+    if (!url) return { passed: false, message: 'Chưa có URL (No URL provided)', score: 0 };
     const keywordSlug = keyword.replace(/\s+/g, '-').toLowerCase();
     const passed = url.toLowerCase().includes(keyword.toLowerCase()) || 
                    url.toLowerCase().includes(keywordSlug);
@@ -257,32 +257,32 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? 'Focus keyword found in URL' : 'Use Focus Keyword in the URL.',
+      message: passed ? 'Từ khóa chính được tìm thấy trong URL (Focus keyword found in URL)' : 'Sử dụng Từ khóa chính trong URL. (Use Focus Keyword in the URL)',
       scoreText: `${score}/${maxScore}`
     };
   }
 
   testFocusKeywordAtBeginning(content, keyword, maxScore = 3) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
     const firstParagraph = content.split(/\n\s*\n/)[0] || content.substring(0, 300);
     const passed = firstParagraph.toLowerCase().includes(keyword.toLowerCase());
     const score = passed ? maxScore : 0;
     return { 
       passed, 
       score,
-      message: passed ? 'Focus keyword found at beginning' : 'Use Focus Keyword at the beginning of your content.',
+      message: passed ? 'Từ khóa chính được tìm thấy ở đầu nội dung (Focus keyword found at beginning)' : 'Sử dụng Từ khóa chính ở đầu nội dung của bạn. (Use Focus Keyword at the beginning of your content)',
       scoreText: `${score}/${maxScore}`
     };
   }
 
   testFocusKeywordInContent(content, keyword, maxScore = 3) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
     const passed = content.toLowerCase().includes(keyword.toLowerCase());
     const score = passed ? maxScore : 0;
     return { 
       passed, 
       score,
-      message: passed ? 'Focus keyword found in content' : 'Use Focus Keyword in the content.',
+      message: passed ? 'Từ khóa chính được tìm thấy trong nội dung (Focus keyword found in content)' : 'Sử dụng Từ khóa chính trong nội dung. (Use Focus Keyword in the content)',
       scoreText: `${score}/${maxScore}`
     };
   }
@@ -294,22 +294,22 @@ export class RankMathSEOEngine {
     
     if (wordCount < 600) {
       score = 0;
-      message = `Content is ${wordCount} words long. Add more content.`;
+      message = `Nội dung dài ${wordCount} từ. Hãy thêm nội dung. (Content is ${wordCount} words long. Add more content)`;
     } else if (wordCount <= 1000) {
       score = 1;
-      message = `Content is ${wordCount} words long. Good job!`;
+      message = `Nội dung dài ${wordCount} từ.  (Content is ${wordCount} words long. Good job!)`;
     } else if (wordCount <= 1500) {
       score = 2;
-      message = `Content is ${wordCount} words long. Good job!`;
+      message = `Nội dung dài ${wordCount} từ.  (Content is ${wordCount} words long. Good job!)`;
     } else if (wordCount <= 2000) {
       score = 3;
-      message = `Content is ${wordCount} words long. Good job!`;
+      message = `Nội dung dài ${wordCount} từ.  (Content is ${wordCount} words long. Good job!)`;
     } else if (wordCount <= 2500) {
       score = 4;
-      message = `Content is ${wordCount} words long. Good job!`;
+      message = `Nội dung dài ${wordCount} từ.  (Content is ${wordCount} words long. Good job!)`;
     } else {
       score = 7; // >2500 words gets max score
-      message = `Content is ${wordCount} words long. Excellent!`;
+      message = `Nội dung dài ${wordCount} từ. Tuyệt vời! (Content is ${wordCount} words long. Excellent!)`;
     }
     
     const passed = score > 0;
@@ -327,7 +327,7 @@ export class RankMathSEOEngine {
   // =================================
 
   testFocusKeywordInSubheadings(content, keyword, maxScore = 2) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
     const headingRegex = /<h[2-6][^>]*>(.*?)<\/h[2-6]>/gi;
     const headings = [];
     let match;
@@ -345,13 +345,13 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? 'Focus keyword found in subheadings' : 'Use Focus Keyword in subheading(s) like H2, H3, H4, etc..',
+      message: passed ? 'Từ khóa chính được tìm thấy trong các tiêu đề phụ (Focus keyword found in subheadings)' : 'Sử dụng Từ khóa chính trong (các) tiêu đề phụ như H2, H3, H4, v.v. (Use Focus Keyword in subheading(s) like H2, H3, H4, etc.)',
       scoreText: `${score}/${maxScore}`
     };
   }
 
   testImageWithFocusKeyword(content, images, keyword, maxScore = 2) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
     
     let foundInImages = false;
     let foundInContent = false;
@@ -384,13 +384,13 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? 'Image with focus keyword alt text found' : 'Add an image with your Focus Keyword as alt text.',
+      message: passed ? 'Tìm thấy hình ảnh với văn bản thay thế chứa từ khóa chính (Image with focus keyword alt text found)' : 'Thêm một hình ảnh với Từ khóa chính của bạn làm văn bản thay thế (alt text). (Add an image with your Focus Keyword as alt text)',
       scoreText: `${score}/${maxScore}`
     };
   }
 
   testKeywordDensity(content, keyword, maxScore = 6) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
     const wordCount = this.countWords(content);
     const keywordCount = this.countKeywordOccurrences(content, keyword);
     const density = wordCount > 0 ? (keywordCount / wordCount) * 100 : 0;
@@ -400,19 +400,19 @@ export class RankMathSEOEngine {
     
     if (density === 0 || density < 0.5) {
       score = 0;
-      message = `Keyword Density is ${density.toFixed(1)}%. Aim for around 1% Keyword Density.`;
+      message = `Mật độ Từ khóa là ${density.toFixed(2)}%. Hãy nhắm đến khoảng 1%. (Keyword Density: ${density.toFixed(2)}%. Aim for ~1%)`;
     } else if (density >= 0.5 && density < 0.75) {
       score = 2;
-      message = `Keyword density is ${density.toFixed(2)}%, the Focus Keyword appears ${keywordCount} times.`;
+      message = `Mật độ từ khóa là ${density.toFixed(2)}%, xuất hiện ${keywordCount} lần. (Keyword density: ${density.toFixed(2)}%, appears ${keywordCount} times)`;
     } else if (density >= 0.75 && density < 1.0) {
       score = 3;
-      message = `Keyword density is ${density.toFixed(2)}%, the Focus Keyword appears ${keywordCount} times.`;
+      message = `Mật độ từ khóa là ${density.toFixed(2)}%, xuất hiện ${keywordCount} lần. (Keyword density: ${density.toFixed(2)}%, appears ${keywordCount} times)`;
     } else if (density >= 1.0 && density <= 2.5) {
       score = 6;
-      message = `Keyword density is ${density.toFixed(2)}%, the Focus Keyword appears ${keywordCount} times.`;
+      message = `Mật độ từ khóa là ${density.toFixed(2)}%, xuất hiện ${keywordCount} lần. (Keyword density: ${density.toFixed(2)}%, appears ${keywordCount} times)`;
     } else {
       score = 0;
-      message = `Keyword Density is ${density.toFixed(1)}%. Too high! Aim for around 1% Keyword Density.`;
+      message = `Mật độ Từ khóa là ${density.toFixed(2)}%. Quá cao! Hãy nhắm đến khoảng 1%. (Keyword Density: ${density.toFixed(2)}%. Too high! Aim for ~1%)`;
     }
     
     const passed = score > 0;
@@ -427,14 +427,14 @@ export class RankMathSEOEngine {
   }
 
   testUrlLength(url, maxScore = 4) {
-    if (!url) return { passed: false, message: 'No URL provided', score: 0 };
+    if (!url) return { passed: false, message: 'Chưa có URL (No URL provided)', score: 0 };
     const length = url.length;
     const passed = length <= 75;
     const score = passed ? maxScore : 0;
     return { 
       passed, 
       score,
-      message: passed ? `URL is ${length} characters long. Kudos!` : `URL is ${length} characters long. Consider shortening it.`,
+      message: passed ? `URL dài ${length} ký tự. Tuyệt vời! (URL is ${length} characters long. Kudos!)` : `URL dài ${length} ký tự. Hãy cân nhắc rút gọn nó. (URL is ${length} characters long. Consider shortening it)`,
       length: length,
       scoreText: `${score}/${maxScore}`
     };
@@ -459,8 +459,8 @@ export class RankMathSEOEngine {
       passed, 
       score,
       message: passed 
-        ? `Great! You are linking to ${externalLinks.length} external resources.` 
-        : 'Link out to external resources.',
+        ? `Tuyệt vời! Bạn đang liên kết đến ${externalLinks.length} nguồn tài nguyên bên ngoài. (Great! You are linking to ${externalLinks.length} external resources)` 
+        : 'Liên kết đến các nguồn tài nguyên bên ngoài. (Link out to external resources)',
       count: externalLinks.length,
       externalLinks: externalLinks,
       scoreText: `${score}/${maxScore}`
@@ -492,8 +492,8 @@ export class RankMathSEOEngine {
       passed, 
       score,
       message: passed 
-        ? `At least ${links.length} external link with DoFollow found in your content.` 
-        : 'Add DoFollow links pointing to external resources.',
+        ? `Tìm thấy ít nhất ${links.length} liên kết ngoài với DoFollow trong nội dung của bạn. (At least ${links.length} external link with DoFollow found in your content)` 
+        : 'Thêm liên kết DoFollow trỏ đến các nguồn tài nguyên bên ngoài. (Add DoFollow links pointing to external resources)',
       count: links.length,
       doFollowLinks: links,
       scoreText: `${score}/${maxScore}`
@@ -520,8 +520,8 @@ export class RankMathSEOEngine {
       passed, 
       score,
       message: passed 
-        ? `You are linking to ${internalLinks.length} other resources on your website which is great.` 
-        : `Add internal links in your content pointing to your website (${FRONTEND_PUBLIC_URL}).`,
+        ? `Bạn đang liên kết đến ${internalLinks.length} tài nguyên khác trên trang web của bạn, điều này rất tốt. (You are linking to ${internalLinks.length} other resources on your website which is great)` 
+        : `Thêm liên kết nội bộ trong nội dung của bạn trỏ đến trang web của bạn (${FRONTEND_PUBLIC_URL}). (Add internal links in your content pointing to your website (${FRONTEND_PUBLIC_URL}))`,
       count: internalLinks.length,
       internalLinks: internalLinks,
       scoreText: `${score}/${maxScore}`
@@ -534,7 +534,7 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? "You haven't used this Focus Keyword before." : 'Set a Focus Keyword for this content.',
+      message: passed ? "Bạn chưa sử dụng Từ khóa chính này trước đây. (You haven't used this Focus Keyword before)" : 'Đặt một Từ khóa chính cho nội dung này. (Set a Focus Keyword for this content)',
       scoreText: `${score}/${maxScore}`
     };
   }
@@ -546,7 +546,7 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: 'You are using Content AI to optimise this Post.',
+      message: 'Bạn đang sử dụng Content AI để tối ưu hóa Bài đăng này. (You are using Content AI to optimise this Post)',
       scoreText: `${score}/${maxScore}`
     };
   }
@@ -556,14 +556,14 @@ export class RankMathSEOEngine {
   // =================================
 
   testFocusKeywordNearBeginning(title, keyword, maxScore = 2) {
-    if (!keyword) return { passed: false, message: 'No focus keyword set', score: 0 };
+    if (!keyword) return { passed: false, message: 'Chưa có từ khóa chính (No focus keyword set)', score: 0 };
     const keywordIndex = title.toLowerCase().indexOf(keyword.toLowerCase());
     const passed = keywordIndex >= 0 && keywordIndex <= 10;
     const score = passed ? maxScore : 0;
     return { 
       passed, 
       score,
-      message: passed ? 'Focus Keyword used at the beginning of SEO title.' : 'Use the Focus Keyword near the beginning of SEO title.',
+      message: passed ? 'Từ khóa chính được sử dụng ở đầu tiêu đề SEO. (Focus Keyword used at the beginning of SEO title)' : 'Sử dụng Từ khóa chính gần đầu tiêu đề SEO. (Use the Focus Keyword near the beginning of SEO title)',
       scoreText: `${score}/${maxScore}`
     };
   }
@@ -588,7 +588,7 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? 'Your title has a positive or a negative sentiment.' : 'Titles with positive or negative sentiment work best for higher CTR.',
+      message: passed ? 'Tiêu đề của bạn có cảm xúc tích cực hoặc tiêu cực. (Your title has a positive or a negative sentiment)' : 'Tiêu đề có cảm xúc tích cực hoặc tiêu cực hoạt động tốt nhất để tăng CTR. (Titles with positive or negative sentiment work best for higher CTR)',
       scoreText: `${score}/${maxScore}`
     };
   }
@@ -606,7 +606,7 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? 'Your title contains power word(s). Booyah!' : 'Add power words to your title to increase CTR.',
+      message: passed ? 'Tiêu đề của bạn chứa (các) từ ngữ mạnh mẽ. Tuyệt vời! (Your title contains power word(s). Booyah!)' : 'Thêm từ ngữ mạnh mẽ vào tiêu đề của bạn để tăng CTR. (Add power words to your title to increase CTR)',
       scoreText: `${score}/${maxScore}`
     };
   }
@@ -617,7 +617,7 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? 'You are using a number in your SEO title.' : 'Add a number to your title to improve CTR.',
+      message: passed ? 'Bạn đang sử dụng số trong tiêu đề SEO của bạn. (You are using a number in your SEO title)' : 'Thêm một số vào tiêu đề của bạn để cải thiện CTR. (Add a number to your title to improve CTR)',
       scoreText: `${score}/${maxScore}`
     };
   }
@@ -639,13 +639,12 @@ export class RankMathSEOEngine {
     return { 
       passed, 
       score,
-      message: passed ? 'You are using Table of Contents to break-down your text.' : 'Use Table of Content to break-down your text.',
+      message: passed ? 'Bạn đang sử dụng Mục lục để phân chia văn bản của bạn. (You are using Table of Contents to break-down your text)' : 'Sử dụng Mục lục để phân chia văn bản của bạn. (Use Table of Content to break-down your text)',
       scoreText: `${score}/${maxScore}`
     };
   }
 
-  // Thay thế trong class RankMathSEOEngine
-testShortParagraphs(content, maxScore = 3) {
+  testShortParagraphs(content, maxScore = 3) {
   // 1) Tách theo <p>... </p> giống Rank Math
   const pMatches = [...content.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)];
   let paragraphs;
@@ -673,8 +672,8 @@ testShortParagraphs(content, maxScore = 3) {
     passed,
     score,
     message: passed
-      ? 'You are using short paragraphs.'
-      : 'At least one paragraph is long. Consider using short paragraphs.',
+      ? 'Bạn đang sử dụng các đoạn văn ngắn. (You are using short paragraphs)'
+      : 'Ít nhất một đoạn văn dài. Hãy cân nhắc sử dụng các đoạn văn ngắn. (At least one paragraph is long. Consider using short paragraphs)',
     scoreText: `${score}/${maxScore}`
   };
 }
@@ -692,19 +691,19 @@ testShortParagraphs(content, maxScore = 3) {
     
     if (imageCount === 0 && !hasVideos) {
       score = 0;
-      message = 'Add a few images and/or videos to make your content appealing.';
+      message = 'Thêm một vài hình ảnh và/hoặc video để làm cho nội dung của bạn hấp dẫn hơn. (Add a few images and/or videos to make your content appealing)';
     } else if (imageCount === 1) {
       score = 1;
-      message = 'Your content contains images and/or video(s).';
+      message = 'Nội dung của bạn chứa hình ảnh và/hoặc video. (Your content contains images and/or video(s))';
     } else if (imageCount === 2) {
       score = 2;
-      message = 'Your content contains images and/or video(s).';
+      message = 'Nội dung của bạn chứa hình ảnh và/hoặc video. (Your content contains images and/or video(s))';
     } else if (imageCount === 3) {
       score = 4;
-      message = 'Your content contains images and/or video(s).';
+      message = 'Nội dung của bạn chứa hình ảnh và/hoặc video. (Your content contains images and/or video(s))';
     } else if (imageCount >= 4) {
       score = 6;
-      message = 'Your content contains images and/or video(s).';
+      message = 'Nội dung của bạn chứa hình ảnh và/hoặc video. (Your content contains images and/or video(s))';
     }
     
     // Bonus for videos
@@ -769,28 +768,28 @@ testShortParagraphs(content, maxScore = 3) {
    */
   getSuccessMessage(testName, testResult) {
     const successMessages = {
-      focusKeywordInTitle: "Hurray! You're using Focus Keyword in the SEO Title.",
-      focusKeywordInMetaDescription: "Focus Keyword used inside SEO Meta Description.",
-      focusKeywordInURL: "Focus Keyword used in the URL.",
-      focusKeywordAtBeginning: "Focus Keyword appears in the first 10% of the content.",
-      focusKeywordInContent: "Focus Keyword found in the content.",
-      contentLength: `Content is ${this.countWords(testResult.content || '')} words long. Good job!`,
-      focusKeywordInSubheadings: "Focus Keyword found in the subheading(s).",
-      imageWithFocusKeyword: "Focus Keyword found in image alt attribute(s).",
-      keywordDensity: `Keyword Density is ${testResult.density || 'good'}, the Focus Keyword and combination appears multiple times.`,
-      urlLength: `URL is ${testResult.length || 'suitable'} characters long. Kudos!`,
-      externalLinks: `Great! You are linking to ${testResult.count || ''} external resources.`,
-      doFollowLinks: `At least ${testResult.count || 'one'} external link with DoFollow found in your content.`,
-      internalLinks: `You are linking to ${testResult.count || 'other'} internal resources on your website which is great.`,
-      focusKeywordSet: "You haven't used this Focus Keyword before.",
-      contentAI: "You are using Content AI to optimise this Post.",
-      focusKeywordNearBeginning: "Focus Keyword used at the beginning of SEO title.",
-      titleSentiment: "Your title has a positive or a negative sentiment.",
-      titlePowerWords: "Your title contains power word(s). Booyah!",
-      titleHasNumber: "You are using a number in your SEO title.",
-      tableOfContents: "You are using Table of Contents to break-down your text.",
-      shortParagraphs: "You are using short paragraphs.",
-      contentAssets: "Your content contains images and/or video(s)."
+      focusKeywordInTitle: "Tuyệt vời! Bạn đang sử dụng Từ khóa chính trong Tiêu đề SEO. (Hurray! You're using Focus Keyword in the SEO Title)",
+      focusKeywordInMetaDescription: "Từ khóa chính được sử dụng trong Mô tả Meta SEO. (Focus Keyword used inside SEO Meta Description)",
+      focusKeywordInURL: "Từ khóa chính được sử dụng trong URL. (Focus Keyword used in the URL)",
+      focusKeywordAtBeginning: "Từ khóa chính xuất hiện trong 10% đầu tiên của nội dung. (Focus Keyword appears in the first 10% of the content)",
+      focusKeywordInContent: "Từ khóa chính được tìm thấy trong nội dung. (Focus Keyword found in the content)",
+      contentLength: `Nội dung dài ${this.countWords(testResult.content || '')} từ.  (Content is ${this.countWords(testResult.content || '')} words long. Good job!)`,
+      focusKeywordInSubheadings: "Từ khóa chính được tìm thấy trong (các) tiêu đề phụ. (Focus Keyword found in the subheading(s))",
+      imageWithFocusKeyword: "Từ khóa chính được tìm thấy trong (các) thuộc tính alt của hình ảnh. (Focus Keyword found in image alt attribute(s))",
+      keywordDensity: `Mật độ Từ khóa là ${typeof testResult.density === 'number' ? testResult.density.toFixed(2) : 'tốt'}%. (Keyword Density: ${typeof testResult.density === 'number' ? testResult.density.toFixed(2) : 'good'}%)`,
+      urlLength: `URL dài ${testResult.length || 'phù hợp'} ký tự. Tuyệt vời! (URL is ${testResult.length || 'suitable'} characters long. Kudos!)`,
+      externalLinks: `Tuyệt vời! Bạn đang liên kết đến ${testResult.count || ''} nguồn tài nguyên bên ngoài. (Great! You are linking to ${testResult.count || ''} external resources)`,
+      doFollowLinks: `Tìm thấy ít nhất ${testResult.count || 'một'} liên kết ngoài với DoFollow trong nội dung của bạn. (At least ${testResult.count || 'one'} external link with DoFollow found in your content)`,
+      internalLinks: `Bạn đang liên kết đến ${testResult.count || 'các'} tài nguyên nội bộ trên trang web của bạn, điều này rất tốt. (You are linking to ${testResult.count || 'other'} internal resources on your website which is great)`,
+      focusKeywordSet: "Bạn chưa sử dụng Từ khóa chính này trước đây. (You haven't used this Focus Keyword before)",
+      contentAI: "Bạn đang sử dụng Content AI để tối ưu hóa Bài đăng này. (You are using Content AI to optimise this Post)",
+      focusKeywordNearBeginning: "Từ khóa chính được sử dụng ở đầu tiêu đề SEO. (Focus Keyword used at the beginning of SEO title)",
+      titleSentiment: "Tiêu đề của bạn có cảm xúc tích cực hoặc tiêu cực. (Your title has a positive or a negative sentiment)",
+      titlePowerWords: "Tiêu đề của bạn chứa (các) từ ngữ mạnh mẽ. Tuyệt vời! (Your title contains power word(s). Booyah!)",
+      titleHasNumber: "Bạn đang sử dụng số trong tiêu đề SEO của bạn. (You are using a number in your SEO title)",
+      tableOfContents: "Bạn đang sử dụng Mục lục để phân chia văn bản của bạn. (You are using Table of Contents to break-down your text)",
+      shortParagraphs: "Bạn đang sử dụng các đoạn văn ngắn. (You are using short paragraphs)",
+      contentAssets: "Nội dung của bạn chứa hình ảnh và/hoặc video. (Your content contains images and/or video(s))"
     };
 
     return successMessages[testName] || testResult?.message || "Test passed successfully.";
