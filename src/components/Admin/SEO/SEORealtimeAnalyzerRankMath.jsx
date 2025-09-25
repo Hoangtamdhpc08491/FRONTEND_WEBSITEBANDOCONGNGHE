@@ -35,13 +35,14 @@ const SEORealtimeAnalyzer = ({
   onSlugChange,
   images = [],
   socialData = {},
-  expanded = true
+  expanded = true,
+  isSlugFromDatabase = false
 }) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [localFocusKeyword, setLocalFocusKeyword] = useState(focusKeyword);
   const [localMetaDescription, setLocalMetaDescription] = useState(metaDescription);
   const [localSlug, setLocalSlug] = useState(slug);
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(true); // Luôn để true để không tự động generate
   const [showAllIssues, setShowAllIssues] = useState(false);
 
   // Calculate full URL from slug using environment URL
@@ -78,18 +79,9 @@ const SEORealtimeAnalyzer = ({
     setLocalSlug(slug);
   }, [slug]);
 
-  // Auto-generate slug from title if not manually edited
-  useEffect(() => {
-    if (title && !isSlugManuallyEdited) {
-      const autoSlug = autoGenerateSlug(title, localSlug, isSlugManuallyEdited);
-      if (autoSlug !== localSlug) {
-        setLocalSlug(autoSlug);
-        if (onSlugChange) {
-          onSlugChange(autoSlug);
-        }
-      }
-    }
-  }, [title, isSlugManuallyEdited]);
+
+
+
 
   // Handle focus keyword change
   const handleFocusKeywordChange = (event) => {
@@ -119,12 +111,12 @@ const SEORealtimeAnalyzer = ({
     }
   };
 
-  // Generate slug from title
+  // Generate slug from title manually
   const handleGenerateSlug = () => {
     if (title) {
       const newSlug = generateSlug(title);
       setLocalSlug(newSlug);
-      setIsSlugManuallyEdited(false);
+      setIsSlugManuallyEdited(true); // Đánh dấu là đã được chỉnh sửa thủ công
       if (onSlugChange) {
         onSlugChange(newSlug);
       }
