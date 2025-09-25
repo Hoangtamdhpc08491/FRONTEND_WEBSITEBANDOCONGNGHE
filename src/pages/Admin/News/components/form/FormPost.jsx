@@ -50,6 +50,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
   const [focusKeyword, setFocusKeyword] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [slug, setSlug] = useState("");
+  const [isSlugFromDatabase, setIsSlugFromDatabase] = useState(false);
   const [schema, setSchema] = useState(null);
 
   useEffect(() => {
@@ -101,11 +102,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
       setFocusKeyword(existingFocusKeyword);
       setMetaDescription(existingMetaDescription);
       setSlug(existingSlug);
-      console.log('🔑 Loaded SEO data from database:', { 
-        focusKeyword: existingFocusKeyword,
-        metaDescription: existingMetaDescription,
-        slug: existingSlug
-      });
+      setIsSlugFromDatabase(Boolean(existingSlug && mode === "edit"));
         }
   
       } catch (err) {
@@ -284,6 +281,7 @@ const FormPost = ({ onSubmit, initialData, mode = "add" }) => {
             onMetaDescriptionChange={setMetaDescription}
             onSlugChange={setSlug}
             mode={mode}
+            isSlugFromDatabase={isSlugFromDatabase}
             url={slug ? `${FRONTEND_PUBLIC_URL}/tin-tuc/${slug}` : `${FRONTEND_PUBLIC_URL}/tin-tuc/`}
           />
           
