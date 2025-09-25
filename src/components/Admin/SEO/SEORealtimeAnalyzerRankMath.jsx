@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -11,13 +11,15 @@ import {
   Divider,
   Grid,
   Stack,
-  Button
+  Button,
+  Tooltip
 } from '@mui/material';
 import {
   ExpandMore,
   TrendingUp,
   Link as LinkIcon,
-  AutoAwesome
+  AutoAwesome,
+  Restore
 } from '@mui/icons-material';
 import RankMathSEOScore from './RankMathSEOScoreNew';
 import { useRankMathSEO } from '../../../hooks/useRankMathSEONew';
@@ -36,14 +38,17 @@ const SEORealtimeAnalyzer = ({
   images = [],
   socialData = {},
   expanded = true,
-  isSlugFromDatabase = false
+  isSlugFromDatabase = false,
+  mode = 'add'
 }) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [localFocusKeyword, setLocalFocusKeyword] = useState(focusKeyword);
   const [localMetaDescription, setLocalMetaDescription] = useState(metaDescription);
   const [localSlug, setLocalSlug] = useState(slug);
+  const [originalSlug, setOriginalSlug] = useState(slug); // Lưu slug gốc từ database
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(true); // Luôn để true để không tự động generate
   const [showAllIssues, setShowAllIssues] = useState(false);
+  const hasManualSlugEditRef = useRef(false);
 
   // Calculate full URL from slug using environment URL
   const fullUrl = localSlug ? `${FRONTEND_PUBLIC_URL}/tin-tuc/${localSlug}` : `${FRONTEND_PUBLIC_URL}/tin-tuc/`;
@@ -76,7 +81,13 @@ const SEORealtimeAnalyzer = ({
   }, [metaDescription]);
 
   useEffect(() => {
-    setLocalSlug(slug);
+    const safeSlug = slug || '';
+    setLocalSlug(safeSlug);
+    if (!hasManualSlugEditRef.current) {
+      setOriginalSlug(safeSlug);
+    }
+
+    hasManualSlugEditRef.current = false;
   }, [slug]);
 
 
@@ -104,6 +115,7 @@ const SEORealtimeAnalyzer = ({
   // Handle slug change
   const handleSlugChange = (event) => {
     const newSlug = event.target.value;
+    hasManualSlugEditRef.current = true;
     setLocalSlug(newSlug);
     setIsSlugManuallyEdited(true);
     if (onSlugChange) {
@@ -115,11 +127,22 @@ const SEORealtimeAnalyzer = ({
   const handleGenerateSlug = () => {
     if (title) {
       const newSlug = generateSlug(title);
+      hasManualSlugEditRef.current = true;
       setLocalSlug(newSlug);
       setIsSlugManuallyEdited(true); // Đánh dấu là đã được chỉnh sửa thủ công
       if (onSlugChange) {
         onSlugChange(newSlug);
       }
+    }
+  };
+
+  // Restore original slug from database
+  const handleRestoreOriginalSlug = () => {
+    hasManualSlugEditRef.current = true;
+    setLocalSlug(originalSlug);
+    setIsSlugManuallyEdited(true);
+    if (onSlugChange) {
+      onSlugChange(originalSlug);
     }
   };
 
@@ -211,7 +234,7 @@ const SEORealtimeAnalyzer = ({
 
         {/* Permalink/Slug Input - Always show */}
         <Box sx={{ mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
             <TextField
               fullWidth
               label="Permalink (Slug)"
@@ -236,16 +259,35 @@ const SEORealtimeAnalyzer = ({
               error={!validateSlug(localSlug).isValid}
               helperText={validateSlug(localSlug).message}
             />
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={handleGenerateSlug}
-              disabled={!title}
-              startIcon={<AutoAwesome />}
-              sx={{ minWidth: 120 }}
-            >
-              Tự động
-            </Button>
+            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={handleGenerateSlug}
+                disabled={!title}
+                startIcon={<AutoAwesome />}
+                sx={{ minWidth: 120 }}
+              >
+                Tự động
+              </Button>
+              {mode === 'edit' && originalSlug && (
+                <Tooltip title={`Khôi phục slug gốc từ database: "${originalSlug}"`}>
+                  <span>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleRestoreOriginalSlug}
+                      disabled={!originalSlug || localSlug === originalSlug}
+                      startIcon={<Restore />}
+                      sx={{ minWidth: 120 }}
+                      color="secondary"
+                    >
+                      Khôi phục
+                    </Button>
+                  </span>
+                </Tooltip>
+              )}
+            </Stack>
           </Box>
           
           {/* Google Search Preview */}
