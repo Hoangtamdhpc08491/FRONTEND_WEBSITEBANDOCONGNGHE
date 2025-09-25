@@ -112,14 +112,22 @@ const SEORealtimeAnalyzer = ({
     }
   };
 
-  // Handle slug change
+  // Handle slug change with URL-friendly formatting (integrated from EditSlugDialog)
   const handleSlugChange = (event) => {
-    const newSlug = event.target.value;
+    const value = event.target.value;
+    // Auto convert to URL-friendly slug (logic from EditSlugDialog)
+    const urlFriendlySlug = value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single
+      .trim();
+    
     hasManualSlugEditRef.current = true;
-    setLocalSlug(newSlug);
+    setLocalSlug(urlFriendlySlug);
     setIsSlugManuallyEdited(true);
     if (onSlugChange) {
-      onSlugChange(newSlug);
+      onSlugChange(urlFriendlySlug);
     }
   };
 
@@ -240,7 +248,7 @@ const SEORealtimeAnalyzer = ({
               label="Permalink (Slug)"
               value={localSlug}
               onChange={handleSlugChange}
-              placeholder="duong-dan-url-bai-viet"
+              placeholder="vd: cach-chon-laptop-tot-nhat"
               InputProps={{
                 startAdornment: (
                   <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
@@ -257,7 +265,7 @@ const SEORealtimeAnalyzer = ({
               }}
               size="small"
               error={!validateSlug(localSlug).isValid}
-              helperText={validateSlug(localSlug).message}
+              helperText={`${validateSlug(localSlug).message}${localSlug ? ` • Slug sẽ được tự động format thành URL-friendly` : ''}`}
             />
             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
               <Button
@@ -289,6 +297,18 @@ const SEORealtimeAnalyzer = ({
               )}
             </Stack>
           </Box>
+
+        
+
+          {/* SEO Warning Note (integrated from EditSlugDialog) */}
+          {mode === 'edit' && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="caption" color="textSecondary">
+                <strong>Lưu ý:</strong> Việc thay đổi slug có thể ảnh hưởng đến SEO và các liên kết hiện có. 
+                Hãy đảm bảo cập nhật các liên kết liên quan.
+              </Typography>
+            </Box>
+          )}
           
           {/* Google Search Preview */}
           {(title || localMetaDescription) && (
